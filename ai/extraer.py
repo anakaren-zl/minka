@@ -18,7 +18,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from backend.reglas import MATERIALES, puntos
+from backend.reglas import MARCAS, MATERIALES, puntos
 
 Material = Literal["papel_carton", "plastico_pet", "plastico_otro", "vidrio", "metal", "tetrapak", "organico"]
 MODELO = os.getenv("GEMINI_MODEL", "gemini-flash-latest")
@@ -29,6 +29,7 @@ class Linea(BaseModel):
     material: Material
     cantidad: float = Field(gt=0)
     unidad: Literal["kg", "unidades"]
+    marca: str | None = Field(default=None, description="Marca del envase si la nota la menciona, por ejemplo Cristal o San Luis")
 
 
 class Entrega(BaseModel):
@@ -54,6 +55,8 @@ Reglas:
 - Si un material aparece sin cantidad, usa cantidad 1 y unidad "unidades".
 - bien_segregado es false solo si la nota dice que venía mezclado, sucio o con basura.
 - No inventes materiales que no estén en la nota.
+- Si la nota dice la marca (por ejemplo «5 latas de Cristal»), ponla en marca. Si no la dice, deja marca vacía.
+  Si hay envases del mismo material de marcas distintas, crea una línea por marca.
 
 Nota del reciclador:
 {texto}"""
@@ -120,7 +123,9 @@ def _con_reglas(texto: str) -> Entrega:
                 continue
             usados.append(m.span())
             unidad = "kg" if m.group(2) else "unidades"
-            lineas.append(Linea(material=material, cantidad=_numero(m.group(1)), unidad=unidad))
+            resto = t[m.end():m.end() + 25]
+            marca = next((mc for mc in MARCAS if mc.lower() in resto), None)
+            lineas.append(Linea(material=material, cantidad=_numero(m.group(1)), unidad=unidad, marca=marca))
     mezclado = bool(re.search(r"mezclad|sucio|con basura|no segreg|mal segreg", t))
     return Entrega(lineas=lineas, bien_segregado=not mezclado, observacion="")
 
@@ -146,6 +151,7 @@ def a_tabla(entrega: Entrega) -> list[dict]:
             "material": l.material,
             "Material": MATERIALES[l.material]["nombre"],
             "Cantidad": f"{l.cantidad:g} {l.unidad}",
+            "Marca": l.marca or "Sin marca",
             "kg": round(kg, 2),
             "EcoPuntos": puntos(l.material, kg),
         })

@@ -16,6 +16,10 @@ import numpy as np
 import pandas as pd
 from shapely.geometry import Point, shape
 
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from backend.reglas import MATERIAL_MARCAS, SIN_MARCA  # noqa: E402
+
 RAIZ = Path(__file__).resolve().parents[1]
 DISTRITO = "150118"  # Lurigancho (Chosica), código INEI
 SEMILLA = 20261110
@@ -72,9 +76,12 @@ def entregas(rng: np.random.Generator, padron: pd.DataFrame) -> pd.DataFrame:
             bien = bool(rng.random() > 0.07)
             for material, (p, kg) in MEZCLA.items():
                 if rng.random() < p:
+                    opciones = MATERIAL_MARCAS.get(material)
+                    con_marca = 0.8 if material in ("metal", "plastico_pet", "vidrio", "tetrapak") else 0.1  # el cartón rara vez se identifica
+                    marca = opciones[rng.integers(len(opciones))] if opciones and rng.random() < con_marca else SIN_MARCA
                     filas.append({
                         "id_entrega": id_entrega, "fecha": fecha.date().isoformat(), "codigo": v.codigo,
-                        "reciclador": reciclador, "material": material,
+                        "reciclador": reciclador, "material": material, "marca": marca,
                         "kg": round(float(rng.gamma(2.0, kg / 2.0)), 2), "bien_segregado": bien,
                         "fuente": "sintético",
                     })

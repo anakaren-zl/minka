@@ -38,3 +38,37 @@ class ReglasBono:
 def puntos(material: str, kg: float) -> int:
     """EcoPuntos de una línea de la entrega."""
     return round(MATERIALES[material]["puntos_kg"] * kg)
+
+
+# ───────────────────────────────────────────────────────── marcas
+# Las empresas solo cuentan para sus indicadores los envases de sus propias marcas (conversación 2).
+# Catálogo referencial de marcas públicas del mercado peruano, agrupadas por empresa titular. Sirve
+# para demostrar la trazabilidad por marca; la demo no implica ninguna alianza con estas empresas.
+LATA, PET, VID, TETRA, CAJA, BOLSA = "metal", "plastico_pet", "vidrio", "tetrapak", "papel_carton", "plastico_otro"
+CATALOGO = {
+    "Backus (AB InBev)": {
+        "Cristal": [LATA, VID], "Pilsen Callao": [LATA, VID], "Cusqueña": [LATA, VID], "Arequipeña": [LATA, VID],
+        "San Juan": [LATA, VID], "Corona": [LATA, VID], "Stella Artois": [LATA, VID], "Guaraná Backus": [PET, LATA],
+        "San Mateo": [PET]},
+    "Arca Continental Lindley (Sistema Coca-Cola)": {
+        "Coca-Cola": [PET, LATA, VID], "Inca Kola": [PET, LATA, VID], "Fanta": [PET, LATA], "Sprite": [PET, LATA],
+        "San Luis": [PET], "Powerade": [PET], "Frugos del Valle": [TETRA, PET]},
+    "Grupo AJE": {
+        "Big Cola": [PET], "Cielo": [PET], "Sporade": [PET], "Volt": [PET, LATA], "Pulp": [TETRA, PET],
+        "Cifrut": [PET]},
+    "CBC Peruana (Pepsi)": {
+        "Pepsi": [PET, LATA], "7Up": [PET, LATA], "Concordia": [PET], "Triple Kola": [PET], "Gatorade": [PET]},
+    "Gloria": {"Gloria": [LATA, TETRA], "Pura Vida": [LATA, TETRA], "Bonlé": [LATA, TETRA]},
+    "Nestlé Perú": {"Ideal": [LATA], "Nescafé": [VID, CAJA], "Nesquik": [CAJA, TETRA]},
+    "Laive": {"Laive": [TETRA, LATA]},
+    "Alicorp": {"Primor": [PET], "Cocinero": [PET], "Bolívar": [BOLSA, CAJA], "Opal": [BOLSA], "Don Vittorio": [BOLSA, CAJA]},
+}
+EMPRESAS = {empresa: list(marcas) for empresa, marcas in CATALOGO.items()}
+EMPRESA_DE = {marca: empresa for empresa, marcas in CATALOGO.items() for marca in marcas}
+MARCAS = list(EMPRESA_DE)
+SIN_MARCA = "Otra o no sé"
+MATERIAL_MARCAS = {}
+for _empresa, _marcas in CATALOGO.items():
+    for _marca, _materiales in _marcas.items():
+        for _m in _materiales:
+            MATERIAL_MARCAS.setdefault(_m, []).append(_marca)
