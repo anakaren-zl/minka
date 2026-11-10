@@ -4,3 +4,4 @@ folium>=0.17
 streamlit-folium>=0.22
 pydantic>=2.7
 google-genai>=1.0
+shapely>=2.0
