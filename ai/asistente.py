@@ -42,7 +42,7 @@ def buscar(pregunta: str, k: int = 2) -> list[tuple[str, str]]:
     return [(t, x) for s, t, x in puntaje[:k] if s > 0]
 
 
-PROMPT = """Eres Vera, una vecina que ayuda a otros vecinos a entender el Bono Verde y ReciclaGov.
+PROMPT = """Eres Vera, una vecina de Carapongo que ayuda a otros vecinos a entender el Bono Verde y Minka.
 Responde en español peruano, cálido y claro, en tres oraciones como máximo, usando SOLO la
 información de abajo. Si la respuesta no está ahí, dilo con amabilidad y sugiere consultar a la
 municipalidad. No uses listas ni emojis.
@@ -53,11 +53,44 @@ Información:
 Pregunta del vecino: {pregunta}"""
 
 
+SALUDOS = {"hola", "holi", "buenas", "buenos", "hey", "alo", "saludos", "que tal", "qué tal"}
+GRACIAS = {"gracias", "graciass", "muchas gracias", "genial", "perfecto", "chevere", "chévere", "ok", "oki", "listo"}
+TEMAS = ("Puedo contarte qué es el Bono Verde, cuánto descuento dan, cómo separar tus residuos, cómo funciona "
+         "el ticket digital o qué hacer si tu distrito no tiene el beneficio.")
+
+
+def charla(pregunta: str) -> str | None:
+    """Respuestas para saludos y frases sueltas, que no necesitan buscar en la guía."""
+    t = unicodedata.normalize("NFKD", pregunta.lower()).encode("ascii", "ignore").decode()
+    t = re.sub(r"[^a-z ]", " ", t).strip()
+    palabras = set(t.split())
+    if not t:
+        return None
+    if palabras & {"adios", "chau", "chao", "bye"}:
+        return "¡Hasta pronto, vecino! Gracias por reciclar. Cada aporte cuenta."
+    if t in GRACIAS or (palabras & {"gracias"} and len(palabras) <= 4):
+        return "¡Con gusto! Si te queda alguna duda sobre el reciclaje o tu Bono Verde, aquí estoy."
+    if ("quien eres" in t or "como te llamas" in t or "que eres" in t) and len(palabras) <= 8:
+        return ("Soy Vera, vecina de Carapongo y guía de Minka. Te ayudo a entender el Bono Verde, a separar bien "
+                "tus residuos y a usar tu ticket digital.")
+    if ("que puedes hacer" in t or "en que me ayudas" in t or "ayuda" == t or "que haces" in t) and len(palabras) <= 8:
+        return TEMAS
+    if (palabras & SALUDOS or t.startswith("buen")) and len(palabras) <= 5:
+        return f"¡Hola! Soy Vera, tu vecina guía de Minka. {TEMAS} ¿Por dónde empezamos?"
+    if "como estas" in t and len(palabras) <= 6:
+        return "¡Muy bien, gracias! Feliz de ayudarte a reciclar. ¿Qué te gustaría saber?"
+    return None
+
+
 def responder(pregunta: str) -> tuple[str, list[str], str]:
+    corta = charla(pregunta)
+    if corta:
+        return corta, [], "charla"
     encontrados = buscar(pregunta)
     if not encontrados:
-        return ("Esa pregunta se me escapa. Te recomiendo consultarla con tu municipalidad, en la "
-                "subgerencia de limpieza pública o de gestión ambiental.", [], "reglas")
+        return ("Todavía no sé responder eso, pero sigo aprendiendo. " + TEMAS +
+                " Para otros temas, tu municipalidad puede orientarte en la subgerencia de limpieza pública "
+                "o de gestión ambiental.", [], "reglas")
     fuentes = [t for t, _ in encontrados]
     clave = _clave()
     if clave:

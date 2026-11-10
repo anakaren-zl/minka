@@ -72,3 +72,4 @@ for _empresa, _marcas in CATALOGO.items():
     for _marca, _materiales in _marcas.items():
         for _m in _materiales:
             MATERIAL_MARCAS.setdefault(_m, []).append(_marca)
+MATERIALES_EMPRESA = {e: sorted({m for mats in marcas.values() for m in mats}) for e, marcas in CATALOGO.items()}

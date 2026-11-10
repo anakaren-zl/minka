@@ -1,7 +1,8 @@
-"""ReciclaGov. Cada recojo de reciclaje, registrado y premiado.
+"""Minka. Juntos, cada aporte cuenta.
 
-Modelo mixto. El reciclador registra cada recojo, el vecino gana por reciclar, la municipalidad
-administra su Bono Verde sin papel y la empresa obtiene sus envases de vuelta con trazabilidad.
+Plataforma que conecta a vecinos, recicladores formalizados, municipalidades y empresas. El vecino
+genera un ticket digital, el reciclador lo valida, la municipalidad administra su Bono Verde sin
+papel y la empresa recupera sus envases con trazabilidad por marca.
 
     streamlit run app/streamlit_app.py
 """
@@ -26,7 +27,7 @@ import recicla  # noqa: E402
 from ai.asistente import responder  # noqa: E402
 from backend import minam  # noqa: E402
 from backend.bono import con_puntos, indicadores, padron_beneficiarios, resumen_viviendas  # noqa: E402
-from backend.reglas import EMPRESAS, MATERIALES, SIN_MARCA, ReglasBono  # noqa: E402
+from backend.reglas import EMPRESAS, MATERIALES, MATERIALES_EMPRESA, SIN_MARCA, ReglasBono  # noqa: E402
 from mapas import mapa_satelital  # noqa: E402
 
 DATA = RAIZ / "data"
@@ -34,7 +35,8 @@ DISTRITO = "150118"  # Lurigancho (Chosica), distrito piloto
 P = estilo.PALETA
 MESES = {"2026-09": "Septiembre", "2026-10": "Octubre", "2026-11": "Noviembre"}
 
-st.set_page_config(page_title="ReciclaGov", page_icon=str(RAIZ / "app" / "assets" / "logo.svg"), layout="wide")
+st.set_page_config(page_title="Minka · Juntos, cada aporte cuenta", page_icon=str(RAIZ / "app" / "assets" / "logo.svg"),
+                   layout="wide")
 estilo.aplicar()
 
 
@@ -48,19 +50,24 @@ def cargar():
     return padron, entregas, munis, mapa
 
 
+@st.cache_data
+def cargar_minam():
+    return minam.cargar(DATA)
+
+
 padron, entregas_base, munis, mapa_lima = cargar()
+datos_minam = cargar_minam()
 st.session_state.setdefault("nuevas", [])
 st.session_state.setdefault("chat", [])
+st.session_state.setdefault("contactos", [])
 recicla.iniciar(padron)
+direccion = dict(zip(padron.codigo, padron.direccion))
 
 
 def entregas_todas() -> pd.DataFrame:
     if not st.session_state.nuevas:
         return entregas_base
     return pd.concat([entregas_base, pd.DataFrame(st.session_state.nuevas)], ignore_index=True)
-
-
-etiqueta = {r.codigo: f"{r.codigo}  ·  {r.direccion}" for r in padron[padron.inscrito].itertuples()}
 
 
 def km(lat1, lon1, lat2, lon2) -> float:
@@ -71,76 +78,112 @@ def km(lat1, lon1, lat2, lon2) -> float:
 
 
 def elegir_mes(clave: str, por_defecto: str = "2026-10") -> str:
-    mes = st.segmented_control("Mes", list(MESES), format_func=MESES.get, default=por_defecto, key=clave)
+    mes = st.segmented_control("Mes que quieres revisar", list(MESES), format_func=MESES.get, default=por_defecto, key=clave)
     return mes or por_defecto
 
 
+def t(x: float) -> str:
+    """Toneladas con separador de miles."""
+    return f"{x:,.0f}"
+
+
 # ───────────────────────────────────────────────────────── inicio
+VALORES = [
+    ("transparencia", "Transparencia", "Generamos confianza y hacemos visible el recorrido de los materiales.", P["tinta"]),
+    ("colaboracion", "Colaboración", "Creemos en el trabajo conjunto entre ciudadanos, recicladores, empresas y municipalidades.", P["celeste"]),
+    ("equidad", "Equidad", "Promovemos una cadena de reciclaje más justa e inclusiva.", P["mostaza"]),
+    ("sostenibilidad", "Sostenibilidad", "Asumimos el compromiso de cuidar nuestros recursos.", P["agua"]),
+    ("innovacion", "Innovación", "Ponemos la tecnología al servicio del cambio.", P["tinta"]),
+    ("reconocimiento", "Reconocimiento", "Visibilizamos y valoramos el aporte de cada persona que hace posible el reciclaje.", P["celeste"]),
+]
+PERFILES = [
+    ("vecino", "Soy vecino", "Separo en casa y quiero mi Bono Verde.", "recicla", "vera.png", P["celeste"]),
+    ("reciclador", "Soy reciclador", "Recojo y valido las entregas de mi sector.", "reciclador", "ciclo.png", P["mostaza"]),
+    ("muni", "Soy municipalidad", "Administro el Bono Verde y el padrón para rentas.", "municipalidad", None, P["agua"]),
+    ("empresa", "Soy empresa", "Quiero recuperar los envases de mis marcas.", "empresa", None, P["tinta"]),
+]
+
+
 def inicio():
-    titulo = "Reciclar en casa <em class='resalte'>ahora sí cuenta</em>"
-    texto = ("Conectamos a vecinos, recicladores, municipalidades y empresas para que cada botella, lata o caja que "
-             "se separa en casa quede registrada, premiada y de vuelta en la economía.")
-    if not estilo.video_portada("Bono Verde digital", titulo, texto):
-        estilo.portada("Bono Verde digital", titulo, texto, personaje=True)
+    if not estilo.video_portada(estilo.LEMA, "Reciclar en casa ahora sí cuenta",
+                                "Minka conecta a vecinos, recicladores, municipalidades y empresas para que cada botella, "
+                                "lata o caja que separas quede registrada, reconocida y de vuelta en la economía."):
+        estilo.portada(estilo.LEMA, "Reciclar en casa ahora sí cuenta", "")
     a, b, _ = st.columns([1.1, 1.3, 3])
     with a, st.container(key="cta-recicla"):
         st.page_link(PAG["recicla"], label="Recicla ahora", icon=":material/recycling:")
     with b, st.container(key="cta-muni"):
         st.page_link(PAG["muni"], label="¿Mi distrito premia?", icon=":material/location_on:")
-    estilo.cinta(["<b>8</b> municipalidades con incentivo verificado en normas publicadas",
-                  "<b>Art. 70</b> del D. L. 1278 permite descontar arbitrios a quien recicla",
-                  "<b>20 %</b> de descuento en Villa El Salvador y Villa María del Triunfo",
-                  "<b>15 %</b> en Lurigancho-Chosica desde 2024",
-                  "<b>15 %</b> de PET reciclado exige la Ley 30884 en las botellas",
-                  "<b>229 %</b> más reciclaje con incentivos digitales en Shanghái"])
     estilo.guia("vera", "Hola, vecino reciclador. Si necesitas ayuda, aquí estoy.")
 
-    estilo.seccion("Nuestra historia", "Empezó con una bolsa de botellas")
-    st.markdown(f'''<div class="historia"><div class="foto">{estilo.imagen("vera.png", "Vera", radio="0")}</div><div>
-        <blockquote>«Separaba mis botellas todas las semanas y se las daba al reciclador. Un día me dijeron que con los
-        tickets tenía descuento en mis arbitrios, pero los tickets se perdían y nadie sabía cuántos tenía.»</blockquote>
-        <div class="firma">Vera, vecina de Carapongo · personaje de ReciclaGov inspirado en las conversaciones con usuarios</div>
-        <p>La historia de Vera resume lo que encontramos al investigar. El Perú ya tiene un incentivo que premia a quien
-        recicla, pero se administra con papel, cada municipalidad lo hace a su manera y casi ningún vecino lo conoce.
-        ReciclaGov nace para que ese esfuerzo diario quede registrado y valga.</p></div></div>''', unsafe_allow_html=True)
+    estilo.seccion("Bienvenido a Minka", "¿Con qué perfil te identificas?",
+                   "Elige tu perfil y te llevamos directo a lo que necesitas.")
+    cols = st.columns(4, gap="medium")
+    for c, (clave, titulo, texto, destino, img, color) in zip(cols, PERFILES):
+        figura = (estilo.imagen(img, titulo, radio="0") if img else ui.dibujo(clave, color, 170, fondo=False))
+        with c, st.container(key=f"perfil-{clave}"):
+            st.markdown(f'<div class="perfil" style="background:{color}"><div class="fig">{figura}</div>'
+                        f'<div class="txt"><div class="ptit">{titulo}</div><span>{texto}</span><div class="ir">Entrar</div></div></div>',
+                        unsafe_allow_html=True)
+            st.page_link(PAG[destino], label=titulo)
 
-    estilo.seccion("Lo que nos mueve", "Misión, visión y valores")
+    estilo.seccion("Nuestra historia", "Todo empezó con una vecina como Vera")
+    st.markdown(f'''<div class="historia"><figure>{estilo.imagen("vera_foto.jpg", "Retrato de Vera", radio="24px")}
+        <figcaption>Imagen generada con inteligencia artificial</figcaption></figure><div>
+        <blockquote>«En mi casa siempre separamos las botellas, los cartones y los plásticos. Se los entregamos al
+        reciclador que pasa por el barrio, pero nunca sabemos qué pasa después con esos materiales. Una vecina me contó
+        que podía obtener beneficios en mis arbitrios por participar en el programa de reciclaje de la municipalidad. Sin
+        embargo, no sabía cómo registrar mis entregas ni cómo hacer seguimiento a lo que reciclaba».</blockquote>
+        <div class="firma"><b>Vera, vecina de Carapongo</b> · Personaje de Minka inspirado en conversaciones con usuarios</div>
+        </div></div>
+        <p class="reflexion">La experiencia de Vera refleja un desafío que involucra a distintos actores. Los ciudadanos
+        necesitan que se reconozcan sus aportes, los recicladores y las empresas necesitan visibilizar y dar seguimiento a
+        los materiales recuperados y valorizados, y las municipalidades necesitan mecanismos para gestionar, monitorear e
+        incentivar la participación.</p>
+        <div class="idea-fuerza"><p><b>Minka nace para conectar a estos actores en un mismo espacio digital</b>, facilitar
+        el seguimiento de los materiales reciclables y reconocer el aporte de cada participante. Porque reciclar es un
+        esfuerzo colectivo y <b>cada contribución cuenta</b>.</p></div>''', unsafe_allow_html=True)
+
+    estilo.seccion("Lo que nos mueve", "Misión y visión")
+    st.markdown('''<div class="mosaico"><div class="grid">
+        <div class="c"><h3>Nuestra misión</h3><p>Conectar a ciudadanos, recicladores formalizados, municipalidades y
+        empresas para facilitar, reconocer y hacer seguimiento al reciclaje, mediante un sistema digital que registre y
+        visibilice el aporte de cada actor en la cadena de aprovechamiento de residuos.</p></div>
+        <div class="c"><h3>Nuestra visión</h3><p>Un Perú donde cada material tenga una nueva oportunidad, las comunidades
+        se unan y quienes hacen posible el reciclaje reciban el reconocimiento que merecen.</p></div>
+        <div class="c"><h3>¿Por qué Minka?</h3><p>La minka es una tradición andina de trabajo colectivo, en la que la
+        comunidad se une para lograr algo que beneficia a todos. Reciclar funciona igual, porque nadie lo logra solo.</p>
+        </div></div></div>''', unsafe_allow_html=True)
+
+    estilo.seccion("En qué creemos", "Nuestros valores")
+    st.markdown('<div class="valores">' + "".join(
+        f'<div class="valor"><div class="ic" style="background:{c}">{ui.dibujo(k, c, 40, fondo=False)}</div>'
+        f'<div><b>{n}</b><span>{x}</span></div></div>' for k, n, x, c in VALORES) + '</div>', unsafe_allow_html=True)
+
+    estilo.seccion("Diagnóstico", "El problema que resolvemos",
+                   "En el Perú, la ley ya permite premiar a quien recicla. Sin embargo, el beneficio casi no se usa, "
+                   "porque se gestiona en papel y nadie lleva la cuenta.")
     estilo.fila_tarjetas([
-        estilo.tarjeta("Misión", "Hacer que reciclar en casa sea fácil, visible y premiado, conectando a vecinos, "
-                       "recicladores formalizados, municipalidades y empresas en un solo registro confiable.", numero="01"),
-        estilo.tarjeta("Visión", "Un Perú donde cada envase que sale al mercado vuelve a la economía y donde el trabajo de "
-                       "los recicladores es reconocido, medido y bien pagado.", numero="02"),
+        estilo.tarjeta("El premio ya existe", "El artículo 70 del Decreto Legislativo 1278 permite a las municipalidades "
+                       "descontar arbitrios a los vecinos que separan sus residuos.", numero="8", unidad="municipalidades "
+                       "con este descuento en sus normas, según nuestra revisión"),
+        estilo.tarjeta("Pero casi nadie lo conoce", "Villa María del Triunfo aprobó su bono en 2016. Aun así, la vecina que "
+                       "entrevistamos no sabía cómo funciona y en su casa no se recicla.", numero="2016",
+                       unidad="año en que nació un bono que hoy sus vecinos desconocen"),
+        estilo.tarjeta("Todo se hace en papel", "El vecino junta tickets físicos que se pierden y la municipalidad arma "
+                       "padrones a mano antes de aplicar el descuento.", numero="4", unidad="tickets de papel al mes para "
+                       "ganar el bono en Villa María del Triunfo"),
+        estilo.tarjeta("Y nadie tiene los datos", "Un especialista del MINAM nos confirmó que las municipalidades no "
+                       "reportan cuántos vecinos participan.", numero="0", unidad="reportes que recibe el MINAM sobre "
+                       "quién aplica el bono"),
     ])
-    st.write("")
-    valores = [("T", "Transparencia", "Cada kilo se registra con fecha, lugar y marca."),
-               ("D", "Dignidad", "El reciclador formalizado valida cada recojo y su trabajo queda registrado."),
-               ("C", "Corresponsabilidad", "Estado, empresas y vecinos comparten el costo y el beneficio."),
-               ("E", "Evidencia", "Decidimos con datos, no con supuestos.")]
-    cols = st.columns(4)
-    for c, (ic, t, x) in zip(cols, valores):
-        c.markdown(f'<div class="valor"><div class="ic">{ic}</div><div><b style="color:#234257;font-weight:900">{t}</b>'
-                   f'<br><span style="font-size:.86rem">{x}</span></div></div>', unsafe_allow_html=True)
 
-    estilo.seccion("Diagnóstico", "El problema que resolvemos")
+    estilo.seccion("Una sola herramienta, cuatro actores", "Cómo funciona Minka")
     estilo.fila_tarjetas([
-        estilo.tarjeta("Un incentivo que ya existe", "La ley permite a las municipalidades descontar arbitrios a quienes "
-                       "segregan. Villa El Salvador, Lurigancho-Chosica y Sechura ya lo aplican.", numero="Art. 70"),
-        estilo.tarjeta("Pero todo se hace en papel", "Tickets semanales, padrones casa por casa, firmas y cruces manuales "
-                       "con rentas. En Villa María del Triunfo se necesitan 12 tickets para el descuento.", numero="12"),
-        estilo.tarjeta("Y nadie tiene los datos", "Un especialista del MINAM nos confirmó que el ministerio no sabe qué "
-                       "municipalidades aplican el bono ni cómo les va.", numero="0"),
-    ])
-
-    estilo.seccion("Una sola herramienta, cuatro actores", "Cómo funciona")
-    estilo.fila_tarjetas([
-        estilo.tarjeta("El vecino recicla", "Marca lo que separó, elige el día del recojo y recibe un ticket digital con QR.",
-                       paso="1"),
-        estilo.tarjeta("El reciclador valida", "Escanea el ticket, pesa lo que recibe y confirma. Su trabajo queda "
-                       "registrado.", paso="2"),
-        estilo.tarjeta("La municipalidad premia", "Descarga el padrón de beneficiarios listo para rentas, sin papeles.",
-                       paso="3"),
-        estilo.tarjeta("La empresa recupera", "Recibe los kilos de sus marcas con su origen y financia los premios.",
-                       paso="4"),
+        estilo.tarjeta("El vecino separa", "Marca lo que separó, elige el día del recojo y recibe un ticket digital con QR.", paso="1"),
+        estilo.tarjeta("El reciclador valida", "Escanea el ticket, pesa lo que recibe y confirma. Su trabajo queda registrado.", paso="2"),
+        estilo.tarjeta("La municipalidad premia", "Descarga el padrón de beneficiarios listo para rentas, sin papeles.", paso="3"),
+        estilo.tarjeta("La empresa recupera", "Recibe los kilos de sus marcas con su origen y financia los premios.", paso="4"),
     ])
 
     res = resumen_viviendas(padron, entregas_todas(), "2026-10", ReglasBono())
@@ -150,22 +193,21 @@ def inicio():
         <div class="cifra"><div class="n">{ind["kg"] / 1000:.1f} t</div><div class="t">recuperadas en un mes</div></div>
         <div class="cifra"><div class="n">{ind["beneficiarias"]}</div><div class="t">hogares ganaron su Bono Verde</div></div>
         <div class="cifra"><div class="n">3</div><div class="t">recicladores formalizados</div></div></div>
-        <p class="nota" style="text-align:center;margin-top:-1.2rem">Piloto demostrativo en Lurigancho-Chosica con datos
-        sintéticos.</p>''', unsafe_allow_html=True)
+        <p class="nota" style="text-align:center">Piloto demostrativo en Lurigancho-Chosica con viviendas sintéticas.</p>''',
+                unsafe_allow_html=True)
 
     estilo.seccion("Evidencia", "Por qué funciona")
     estilo.fila_tarjetas([
-        estilo.tarjeta("El dinero motiva más", "En dos experimentos en China, el incentivo monetario fue el más "
-                       "efectivo para reciclar (Lu y Wang, 2022).", numero="1.º"),
+        estilo.tarjeta("El dinero motiva más", "En dos experimentos en China, el incentivo monetario fue el más efectivo "
+                       "para reciclar (Lu y Wang, 2022).", numero="1.º", unidad="incentivo más efectivo"),
         estilo.tarjeta("Ver al vecino también", "Saber cuántos vecinos ya reciclan refuerza el efecto del incentivo "
-                       "(Lu y Wang, 2022).", numero="+"),
-        estilo.tarjeta("Lo digital multiplica", "Un sistema digital de incentivos en Shanghái aumentó la recolección "
-                       "en 229 % en una comunidad piloto (Zhou et al., 2021).", numero="229 %"),
+                       "(Lu y Wang, 2022).", numero="+", unidad="efecto de las normas sociales"),
+        estilo.tarjeta("Lo digital multiplica", "Un sistema digital de incentivos en Shanghái aumentó la recolección en una "
+                       "comunidad piloto (Zhou et al., 2021).", numero="229 %", unidad="más reciclables recolectados"),
     ])
 
-    estilo.seccion("Con quiénes trabajamos", "Un ecosistema que ya existe")
-    st.markdown('<p class="nota">Actores con los que ReciclaGov se articula. Ninguno es todavía un aliado formal.</p>',
-                unsafe_allow_html=True)
+    estilo.seccion("Con quiénes trabajamos", "Un ecosistema que ya existe",
+                   "Actores con los que Minka se articula. Ninguno es todavía un aliado formal.")
     actores = [
         ("estado", "Estado", "Ministerio del Ambiente", "Ente rector. Dicta la norma, capacita a las municipalidades y "
          "publica datos abiertos de residuos."),
@@ -175,7 +217,8 @@ def inicio():
          "corazón operativo del sistema."),
         ("empresa", "Empresas", "Productores de envases", "Backus, Arca Continental Lindley, Grupo AJE, CBC, Gloria, "
          "Nestlé, Laive y Alicorp, entre otros."),
-        ("empresa", "Empresas", "Retail", "Supermercados Peruanos, Cencosud y Tambo, como canales para canjear EcoPuntos."),
+        ("empresa", "Empresas", "Supermercados", "Supermercados Peruanos, Cencosud y Tambo, como posibles canales para "
+         "canjear EcoPuntos."),
         ("academia", "Academia", "Q-Lab PUCP", "Diplomatura de Ciencia de Datos para las Ciencias Sociales y la Gestión "
          "Pública, donde nace el proyecto."),
     ]
@@ -186,30 +229,58 @@ def inicio():
                        f'<div class="txt">{txt}</div></div>', unsafe_allow_html=True)
         st.write("")
 
-    estilo.seccion("Quién está detrás", "Una founder entre el Estado y la sociedad")
-    st.markdown(estilo.tarjeta("Ana Karen Zamalloa Lima", "Comunicadora para el desarrollo por la PUCP, especialista en "
-                               "gestión pública y en ciencia de datos para el análisis social. Ha trabajado con el Estado, "
-                               "la cooperación internacional y la sociedad civil, y diseñó proyectos de diálogo con "
-                               "funcionarios de gobiernos subnacionales."), unsafe_allow_html=True)
+    estilo.seccion("Quién está detrás", "La founder")
+    st.markdown(f'''<div class="founder">{estilo.imagen("founder.jpg", "Ana Karen Zamalloa Lima", "180px", "50%")}<div>
+        <h3>Ana Karen Zamalloa Lima</h3>
+        <p>Comunicadora para el desarrollo y especialista en Gestión Pública por la PUCP, predocente del curso Medio Ambiente
+        y Sostenibilidad, con experiencia en proyectos vinculados al medio ambiente, el desarrollo sostenible y la gestión
+        pública.</p>
+        <p>Dirige el producto, el diseño y la relación con municipalidades y empresas, en tanto que Claude Code actúa como su
+        socio técnico en la ingeniería del software.</p></div></div>''', unsafe_allow_html=True)
 
 
 # ───────────────────────────────────────────────────────── tu municipalidad
+EN_MEDIOS = [
+    ("El Peruano", "2024", "Lurigancho-Chosica da 15 % de descuento a quienes participan en el Programa Recicla",
+     "La Ordenanza 353-MDL premia en el arbitrio de limpieza pública a los contribuyentes empadronados en el programa "
+     "de segregación del distrito.", "https://busquedas.elperuano.pe/dispositivo/NL/2304145-1", P["celeste"]),
+    ("gob.pe", "2025", "Sechura aprueba su Bono Verde para quienes reciclan",
+     "La Ordenanza 005-2025-MPS otorga el incentivo a los contribuyentes que participan en el Programa Recicla de la "
+     "provincia.", "https://www.gob.pe/institucion/munisechura/normas-legales/6594200-005-2025-mps", P["mostaza"]),
+    ("El Popular", "2016", "San Juan de Lurigancho lanza el Ecobono",
+     "El distrito anunció un 10 % de descuento en limpieza pública para los vecinos que entreguen sus reciclables cada "
+     "semana a recicladores autorizados.",
+     "https://elpopular.pe/actualidad-y-policiales/2016-06-06-san-juan-de-lurigancho-dara-incentivo-tributario-vecinos-que-reciclen",
+     P["agua"]),
+    ("Infobae", "2025", "Los recicladores formales del Perú superan los S/ 3.8 millones en ventas",
+     "Según el MINAM, más de 84,000 viviendas fueron registradas como beneficiarias del servicio de reciclaje en las "
+     "ciudades del programa.",
+     "https://www.infobae.com/peru/2025/10/23/recicladores-formales-del-peru-obtuvieron-ingresos-superiores-a-s-38-millones-por-venta-de-residuos-valorizables/",
+     P["tinta"]),
+]
+
+
 def tu_municipalidad():
     estilo.portada("Encuentra tu municipalidad", "¿Tu distrito <em class='resalte'>premia el reciclaje</em>?",
-                   "Toca tu distrito en el mapa o escribe su nombre. Te mostramos si tiene un incentivo vigente, qué "
-                   "norma lo respalda y cuál es el programa más cercano.")
+                   "Averigua si tu municipalidad da un descuento en arbitrios a quienes reciclan, qué norma lo respalda "
+                   "y cuántos residuos genera tu distrito según el MINAM.")
     estilo.guia("ciclo", "Toca tu distrito en el mapa y te cuento si premian el reciclaje.")
+    estilo.como_usar([
+        ("Busca tu distrito", "Escribe su nombre en el buscador de la derecha, por ejemplo Los Olivos."),
+        ("O tócalo en el mapa", "Haz clic sobre tu distrito. Los puntos amarillos tienen un incentivo vigente."),
+        ("Revisa el resultado", "Verás si hay descuento, cuánto es, la norma y cuánto recicla tu distrito."),
+    ])
     nombres = {f["properties"]["NOMBDIST"].title(): f["properties"] for f in mapa_lima["features"]}
     izq, der = st.columns([3, 2], gap="large")
     with izq:
         m = mapa_satelital([-12.03, -76.95], 10)
         folium.GeoJson(mapa_lima, name="Distritos",
                        style_function=lambda _: {"color": "#FFFFFF", "weight": 1.2, "fillOpacity": 0.05},
-                       highlight_function=lambda _: {"fillColor": P["hoja"], "fillOpacity": 0.45},
+                       highlight_function=lambda _: {"fillColor": P["celeste"], "fillOpacity": 0.45},
                        tooltip=folium.GeoJsonTooltip(["NOMBDIST"], labels=False)).add_to(m)
         for r in munis.itertuples():
             folium.CircleMarker([r.lat, r.lon], radius=9, color="#FFFFFF", weight=3, fill=True,
-                                fill_color="#F2A541", fill_opacity=1,
+                                fill_color=P["mostaza"], fill_opacity=1,
                                 tooltip=f"{r.municipalidad}  ·  {r.incentivo}").add_to(m)
         clic = st_folium(m, height=520, use_container_width=True, returned_objects=["last_clicked"])
     elegido = None
@@ -217,64 +288,98 @@ def tu_municipalidad():
         punto = Point(clic["last_clicked"]["lng"], clic["last_clicked"]["lat"])
         elegido = next((f["properties"] for f in mapa_lima["features"] if shape(f["geometry"]).contains(punto)), None)
     with der:
-        buscado = st.text_input("O escribe tu distrito", placeholder="Por ejemplo, Los Olivos")
+        buscado = st.text_input("Escribe el nombre de tu distrito", placeholder="Por ejemplo, Los Olivos")
         if buscado.strip():
             clave = buscado.strip().lower()
             elegido = next((v for k, v in nombres.items() if k.lower().startswith(clave)), None) or elegido
             if not elegido:
-                st.warning("No encontré ese distrito en Lima Metropolitana o el Callao.")
+                st.warning("No encontramos ese distrito en Lima Metropolitana ni en el Callao. Revisa cómo está escrito.")
         if not elegido:
-            st.markdown('<div class="banda">Los puntos naranjas marcan las municipalidades con un incentivo por '
-                        'reciclar que encontramos en normas publicadas.</div>', unsafe_allow_html=True)
-            return
-        fila = munis[munis.ubigeo == elegido["IDDIST"]]
-        poligono = next(shape(f["geometry"]) for f in mapa_lima["features"] if f["properties"]["IDDIST"] == elegido["IDDIST"])
-        st.markdown(f"### {elegido['NOMBDIST'].title()}")
-        if len(fila):
-            r = fila.iloc[0]
-            st.markdown(f'<span class="etiqueta">{r.incentivo}</span><span class="etiqueta sol">{r.estado}</span>',
+            st.markdown('<div class="banda">Aún no elegiste un distrito. Escribe su nombre arriba o tócalo en el mapa. '
+                        'Los <b>puntos amarillos</b> son municipalidades con un incentivo por reciclar.</div>',
                         unsafe_allow_html=True)
-            st.markdown(estilo.tarjeta(r.descuento, f"{r.como_se_gana}. Norma {r.norma} ({r.anio})."),
-                        unsafe_allow_html=True)
-            st.link_button("Ver la norma", r.fuente)
         else:
-            st.markdown('<span class="etiqueta sol">Sin incentivo registrado</span>', unsafe_allow_html=True)
-            st.write("No encontramos una ordenanza publicada que dé descuento en arbitrios por reciclar en este "
-                     "distrito. Eso no significa que no exista, así que vale la pena preguntar.")
-        c = poligono.centroid
-        cercanas = munis.assign(km=[km(c.y, c.x, a, b) for a, b in zip(munis.lat, munis.lon)])
-        cercanas = cercanas[cercanas.ubigeo != elegido["IDDIST"]].nsmallest(1, "km").iloc[0]
-        st.markdown(f'<div class="banda">El programa más cercano es <b>{cercanas.incentivo}</b> de '
-                    f'{cercanas.municipalidad}, a unos {cercanas.km:.0f} km.</div>', unsafe_allow_html=True)
-        st.markdown('<p class="nota">Base legal general. Artículo 70 del Decreto Legislativo 1278, modificado '
-                    'por el Decreto Legislativo 1501.</p>', unsafe_allow_html=True)
+            fila = munis[munis.ubigeo == elegido["IDDIST"]]
+            poligono = next(shape(f["geometry"]) for f in mapa_lima["features"]
+                            if f["properties"]["IDDIST"] == elegido["IDDIST"])
+            st.markdown(f"### {minam.nombre(elegido['NOMBDIST'])}")
+            if len(fila):
+                r = fila.iloc[0]
+                st.markdown(f'<span class="etiqueta">Sí premia el reciclaje</span><span class="etiqueta sol">{r.incentivo}</span>',
+                            unsafe_allow_html=True)
+                st.markdown(estilo.tarjeta(r.descuento, f"<b>¿Cómo se gana?</b> {r.como_se_gana}. Norma {r.norma} "
+                                           f"({r.anio}). {r.estado}."), unsafe_allow_html=True)
+                st.write("")
+                st.link_button("Ver la norma", r.fuente)
+            else:
+                st.markdown('<span class="etiqueta sol">Sin incentivo registrado</span>', unsafe_allow_html=True)
+                st.write("No encontramos una ordenanza publicada que dé descuento en arbitrios por reciclar en este "
+                         "distrito. Eso no significa que no exista, así que vale la pena preguntar en tu municipalidad.")
+            c = poligono.centroid
+            cercanas = munis.assign(km=[km(c.y, c.x, a, b) for a, b in zip(munis.lat, munis.lon)])
+            cercanas = cercanas[cercanas.ubigeo != elegido["IDDIST"]].nsmallest(1, "km").iloc[0]
+            st.markdown(f'<div class="banda">El programa más cercano es <b>{cercanas.incentivo}</b> de '
+                        f'{cercanas.municipalidad}, a unos {cercanas.km:.0f} km.</div>', unsafe_allow_html=True)
+            if datos_minam:
+                pf = minam.perfil(datos_minam[0], elegido["IDDIST"])
+                if pf:
+                    st.markdown(estilo.tarjeta(
+                        "Lo que genera tu distrito", f"Según el MINAM, en {pf['anio']} los hogares de "
+                        f"{minam.nombre(elegido['NOMBDIST'])} generaron {t(pf['total'])} toneladas de residuos. De ellas, "
+                        f"{t(pf['reciclables'])} toneladas eran reciclables y hoy podrían volver a la economía.",
+                        numero=f"{pf['reciclables'] / pf['total'] * 100:.0f} %", unidad="de la basura de los hogares es "
+                        "reciclable"), unsafe_allow_html=True)
+
+    estilo.seccion("Tu Muni en medios", "Municipalidades que ya premian el reciclaje",
+                   "Noticias y normas publicadas sobre distritos que aplican este beneficio. Toca cada tarjeta para leer "
+                   "la fuente completa.")
+    cols = st.columns(4, gap="medium")
+    for c, (medio, anio, titulo, texto, url, color) in zip(cols, EN_MEDIOS):
+        c.markdown(f'''<a href="{url}" target="_blank" style="text-decoration:none"><div class="noticia">
+            <div class="img" style="background:{color}">{ui.dibujo("noticia", color, 84, fondo=False)}</div>
+            <div class="cuerpo"><div class="medio">{medio} · {anio}</div><div class="tit">{titulo}</div>
+            <div class="txt">{texto}</div><div class="medio" style="margin-top:.6rem">Leer en la fuente</div></div>
+            </div></a>''', unsafe_allow_html=True)
+    st.markdown('<p class="nota">Base legal general. Artículo 70 del Decreto Legislativo 1278, modificado por el Decreto '
+                'Legislativo 1501.</p>', unsafe_allow_html=True)
 
 
 # ───────────────────────────────────────────────────────── vecino
 def vecino():
     estilo.portada("Para vecinos", "Mi <em class='resalte'>Bono Verde</em>",
-                   "Revisa tus EcoPuntos, cuánto te falta para tu descuento y cómo va tu barrio.")
+                   "Revisa cuántos puntos llevas, cuánto te falta para tu descuento en arbitrios y cómo va tu barrio.")
     estilo.guia("vera", "Con cuatro entregas al mes ganas tu descuento. ¿Te ayudo a separar mejor?")
+    estilo.como_usar([
+        ("Ingresa", "Escribe tu código de contribuyente. En la demostración ya está el de Vera."),
+        ("Elige el mes", "Toca el mes que quieres revisar."),
+        ("Revisa tu avance", "Cada recojo bien separado suma. Con cuatro al mes, ganas tu descuento."),
+    ])
     reglas = ReglasBono()
-    c1, c2 = st.columns([1.3, 1])
-    with c1:
-        codigo = recicla.elegir_vivienda(etiqueta, "vec")
-    with c2:
-        nuevo = any(n["codigo"] == codigo for n in st.session_state.nuevas)
-        mes = elegir_mes("mes_vec", "2026-11" if nuevo else "2026-10")
+    codigo = recicla.ingresar(padron, "vec")
+    nuevo = any(n["codigo"] == codigo for n in st.session_state.nuevas)
+    mes = elegir_mes("mes_vec", "2026-11" if nuevo else "2026-10")
     res = resumen_viviendas(padron, entregas_todas(), mes, reglas)
     yo = res[res.codigo == codigo].iloc[0]
     sector = res[(res.sector == yo.sector) & res.inscrito]
     barrio = res[res.sector == yo.sector]
+    ahorro = yo.arbitrio_limpieza * reglas.descuento
+    faltan = int(max(reglas.entregas_minimas - yo.entregas_validas, 0))
 
-    m1, m2, m3 = st.columns(3)
-    m1.metric("EcoPuntos del mes", f"{int(yo.puntos)}")
-    m2.metric("Entregas válidas", f"{int(yo.entregas_validas)} de {reglas.entregas_minimas}")
-    m3.metric("Descuento en limpieza pública", f"S/ {yo.arbitrio_limpieza * reglas.descuento:.2f}",
-              "ganado" if yo.cumple else "en camino", delta_color="normal" if yo.cumple else "off")
+    st.markdown(f'<div class="banda" style="font-size:1.15rem">' + (
+        f"<b>¡Felicitaciones! Ganaste tu Bono Verde de {MESES[mes].lower()}.</b> Tendrás S/ {ahorro:.2f} de descuento en "
+        f"tu arbitrio de limpieza pública." if yo.cumple else
+        f"<b>Te {'falta' if faltan == 1 else 'faltan'} {faltan} {'recojo bien separado' if faltan == 1 else 'recojos bien separados'}</b> en {MESES[mes].lower()} para ganar S/ {ahorro:.2f} de "
+        f"descuento en tu arbitrio de limpieza pública.") + '</div>', unsafe_allow_html=True)
+    estilo.metricas([
+        ("Recojos válidos", f"{int(yo.entregas_validas)} de {reglas.entregas_minimas}",
+         "Entregas bien separadas de al menos medio kilo. Necesitas cuatro al mes."),
+        ("EcoPuntos del mes", f"{int(yo.puntos)}", "Puntos que ganas por cada kilo. Las latas y botellas valen más."),
+        ("Kilos reciclados", f"{yo.kg:.1f} kg", "Todo lo que el reciclador pesó y validó este mes."),
+        ("Tu descuento", f"S/ {ahorro:.2f}", "Es el 15 % de tu arbitrio de limpieza pública, como manda la ordenanza."),
+    ], destacar=3 if yo.cumple else None)
+    st.write("")
     st.progress(min(yo.entregas_validas / reglas.entregas_minimas, 1.0),
-                text="Ganaste tu Bono Verde este mes" if yo.cumple else
-                f"Te faltan {int(reglas.entregas_minimas - yo.entregas_validas)} entregas para tu descuento")
+                text="Avance hacia tu Bono Verde del mes")
     participan = (barrio.entregas > 0).mean()
     st.markdown(f'<div class="banda"><b>{round(participan * 10)} de cada 10</b> hogares de {yo.sector} ya reciclaron '
                 f'este mes. {"Tú eres parte de ellos." if yo.entregas > 0 else "Súmate esta semana."}</div>',
@@ -282,127 +387,197 @@ def vecino():
 
     izq, der = st.columns(2, gap="large")
     with izq:
-        st.markdown("#### Tú y tu barrio")
+        st.markdown("#### ¿Cuánto reciclo comparado con mi barrio?")
         st.markdown(ui.comparar(float(yo.kg), float(sector.kg.mean()), yo.sector), unsafe_allow_html=True)
+        st.markdown('<p class="nota">La barra de tu barrio muestra el promedio de kilos de las viviendas inscritas de tu '
+                    'sector.</p>', unsafe_allow_html=True)
     with der:
-        st.markdown("#### Mis entregas del mes")
+        st.markdown("#### Mis recojos del mes")
         mias = con_puntos(entregas_todas())
         mias = mias[(mias.codigo == codigo) & (mias.mes == mes)]
         lista = []
         for (fecha, _), g in mias.groupby(["fecha", "id_entrega"]):
-            mats = ", ".join(sorted({MATERIALES[m]["nombre"].lower() for m in g.material}))
+            mats = ", ".join(sorted({recicla.minuscula(MATERIALES[m]["nombre"]) for m in g.material}))
             lista.append({"fecha": pd.Timestamp(fecha).strftime("%d/%m/%Y"), "kg": g.kg.sum(),
                           "puntos": int(g.puntos.sum()), "detalle": mats,
                           "valida": bool(g.bien_segregado.all() and g.kg.sum() >= reglas.kg_minimos)})
         st.markdown(ui.linea_tiempo(lista), unsafe_allow_html=True)
+        st.markdown('<p class="nota">«Válida» significa que el recojo cuenta para tu bono. «No suma» aparece cuando vino '
+                    'mezclado o pesó menos de medio kilo.</p>', unsafe_allow_html=True)
 
 
 # ───────────────────────────────────────────────────────── municipalidad
 def municipalidad():
     estilo.portada("Para municipalidades", "Tablero de <em class='resalte'>Lurigancho-Chosica</em>",
-                   "Piloto con datos sintéticos. Ajusta las reglas de tu ordenanza, mira el avance en el mapa y "
-                   "descarga el padrón de beneficiarios para el área de rentas.")
+                   "Revisa cuántos vecinos reciclan, quiénes ganan el Bono Verde y descarga el padrón listo para el área "
+                   "de rentas. Las viviendas son sintéticas y los datos del distrito provienen del MINAM.")
     estilo.guia("ciclo", "El padrón ya está listo para rentas. Sin tickets ni firmas.")
+    estilo.como_usar([
+        ("Elige el mes", "Toca el mes que quieres revisar."),
+        ("Ajusta tu ordenanza", "Mueve las reglas, como el número de recojos o el porcentaje de descuento."),
+        ("Mira el avance", "El mapa muestra qué viviendas ganan el bono y cuáles aún no."),
+        ("Descarga el padrón", "Baja la lista de beneficiarios y envíala a rentas."),
+    ])
     c1, c2, c3 = st.columns([1.2, 1, 1])
     with c1:
         mes = elegir_mes("mes_mun")
-    reglas = ReglasBono(entregas_minimas=c2.slider("Entregas mínimas al mes", 1, 5, 4),
+    reglas = ReglasBono(entregas_minimas=c2.slider("Recojos válidos al mes para ganar el bono", 1, 5, 4),
                         descuento=c3.slider("Descuento en limpieza pública (%)", 5, 30, 15) / 100)
     res = resumen_viviendas(padron, entregas_todas(), mes, reglas)
     ind = indicadores(res)
-    k = st.columns(5)
-    k[0].metric("Viviendas inscritas", ind["inscritas"])
-    k[1].metric("Participaron", ind["participan"])
-    k[2].metric("Ganan el bono", ind["beneficiarias"])
-    k[3].metric("Toneladas recuperadas", f"{ind['kg'] / 1000:.2f}")
-    k[4].metric("Descuento a otorgar", f"S/ {ind['descuento_total']:,.0f}")
+    estilo.metricas([
+        ("Viviendas inscritas", f"{ind['inscritas']}", "Hogares empadronados en el programa de segregación."),
+        ("Participaron", f"{ind['participan']}", "Entregaron al menos una vez en el mes."),
+        ("Ganan el bono", f"{ind['beneficiarias']}", f"Cumplieron {reglas.entregas_minimas} recojos válidos."),
+        ("Toneladas recuperadas", f"{ind['kg'] / 1000:.2f}", "Reciclables que no fueron al relleno sanitario."),
+        ("Descuento a otorgar", f"S/ {ind['descuento_total']:,.0f}", "Lo que rentas descontará en total este mes."),
+    ])
 
     izq, der = st.columns([3, 2], gap="large")
     with izq:
-        st.markdown("#### Viviendas del programa")
+        st.markdown("#### ¿Dónde están las viviendas del programa?")
         m = mapa_satelital([-11.975, -76.83], 12)
         lur = [f for f in mapa_lima["features"] if f["properties"]["IDDIST"] == DISTRITO]
         folium.GeoJson({"type": "FeatureCollection", "features": lur},
                        style_function=lambda _: {"color": "#FFFFFF", "weight": 2.5, "fillOpacity": 0}).add_to(m)
         for r in res[res.inscrito].itertuples():
-            color = "#6DBE45" if r.cumple else ("#F2A541" if r.entregas > 0 else "#FFFFFF")
-            folium.CircleMarker([r.lat, r.lon], radius=6, color=P["noche"], weight=1.5, fill=True, fill_color=color,
-                                fill_opacity=1, tooltip=f"{r.codigo}  ·  {r.sector}  ·  {int(r.entregas_validas)} "
-                                                        f"entregas válidas").add_to(m)
+            color = P["mostaza"] if r.cumple else (P["celeste"] if r.entregas > 0 else "#FFFFFF")
+            folium.CircleMarker([r.lat, r.lon], radius=6, color=P["tinta"], weight=1.5, fill=True, fill_color=color,
+                                fill_opacity=1, tooltip=f"{r.direccion}  ·  {int(r.entregas_validas)} recojos "
+                                                        f"válidos").add_to(m)
         st_folium(m, height=440, use_container_width=True, returned_objects=[])
-        st.markdown('<p class="nota">Verde, gana el bono. Naranja, participa pero aún no cumple. Blanco, inscrita sin '
-                    'entregas.</p>', unsafe_allow_html=True)
+        st.markdown('<p class="nota"><b>Amarillo</b>, gana el bono. <b>Celeste</b>, participa pero aún no cumple. '
+                    '<b>Blanco</b>, inscrita sin entregas en el mes.</p>', unsafe_allow_html=True)
     with der:
-        st.markdown("#### Qué se recicla")
+        st.markdown("#### ¿Qué se recicla más?")
         mat = con_puntos(entregas_todas())
         mat = mat[mat.mes == mes].groupby("material").kg.sum().sort_values(ascending=False)
         st.markdown(ui.barras([(MATERIALES[k]["nombre"], v, "") for k, v in mat.items()],
                               destacar=MATERIALES[mat.index[0]]["nombre"] if len(mat) else None), unsafe_allow_html=True)
-    st.markdown("#### Participación por sector")
+    st.markdown("#### ¿Qué sectores participan más?")
     sec = res[res.inscrito].groupby("sector").agg(inscritas=("codigo", "size"), con_bono=("cumple", "sum"))
     sec["pct"] = sec.con_bono / sec.inscritas * 100
     st.markdown(ui.barras([(s, r.pct, f"{int(r.con_bono)} de {int(r.inscritas)} viviendas inscritas ganan el bono")
                            for s, r in sec.sort_values("pct", ascending=False).iterrows()], unidad="%"),
                 unsafe_allow_html=True)
 
-    estilo.seccion("Listo para rentas", "Padrón de beneficiarios")
-    st.markdown('<p class="nota">Este archivo reemplaza el cruce manual de tickets, firmas y padrones en papel.</p>',
-                unsafe_allow_html=True)
+    estilo.seccion("Listo para rentas", "Padrón de beneficiarios",
+                   "Esta lista reemplaza el cruce manual de tickets, firmas y padrones en papel. Cada fila es un "
+                   "contribuyente que cumplió las reglas del mes y el monto que se le descuenta.")
     benef = padron_beneficiarios(res)
-    st.markdown(ui.tabla(benef, alto=320), unsafe_allow_html=True)
+    sector_de = dict(zip(padron.contribuyente, padron.sector))
+    vista = pd.DataFrame({
+        "Contribuyente": benef["Código de contribuyente"],
+        "Dirección": benef["Dirección"],
+        "Sector": benef["Código de contribuyente"].map(sector_de),
+        "Recojos válidos": benef["Entregas válidas"].astype(int).astype(str) + f" de {reglas.entregas_minimas}",
+        "Kilos reciclados": benef["kg reciclados"].map(lambda x: f"{x:.1f} kg"),
+        "Descuento": benef["Descuento (S/)"].map(lambda x: f"S/ {x:.2f}"),
+    })
+    filtro = st.text_input("Busca por dirección, sector o código de contribuyente", placeholder="Por ejemplo, Carapongo")
+    if filtro.strip():
+        f = filtro.strip().lower()
+        vista = vista[vista.apply(lambda r: f in " ".join(r.astype(str)).lower(), axis=1)]
+    st.markdown(f'<p class="nota">{len(vista)} {"beneficiario" if len(vista) == 1 else "beneficiarios"} en '
+                f'{MESES[mes].lower()}.</p>', unsafe_allow_html=True)
+    st.markdown(ui.tabla(vista, alto=340), unsafe_allow_html=True)
     st.write("")
-    st.download_button("Descargar padrón en CSV", benef.to_csv(index=False).encode("utf-8-sig"),
+    st.download_button("Descargar padrón para rentas (CSV)", benef.to_csv(index=False).encode("utf-8-sig"),
                        file_name=f"padron-bono-verde-{mes}.csv", mime="text/csv", type="primary")
 
-    contexto = minam.cargar(DATA)
-    if contexto is not None:
-        st.markdown("#### El distrito en los datos abiertos del MINAM")
-        minam.mostrar(contexto, mapa_lima, DISTRITO, ind["kg"])
+    if datos_minam:
+        comp, gen = datos_minam
+        pf = minam.perfil(comp, DISTRITO)
+        estilo.seccion("Datos reales del MINAM", f"¿Cuánta basura genera {pf['distrito'].replace('Lurigancho', 'Lurigancho-Chosica')}?",
+                       f"Según los datos abiertos del Ministerio del Ambiente, en {pf['anio']} los hogares del distrito "
+                       f"generaron {t(pf['total'])} toneladas de residuos. {pf['reciclables'] / pf['total'] * 100:.0f} de cada "
+                       f"100 toneladas eran reciclables y podrían volver a la economía en lugar de ir al relleno sanitario.")
+        estilo.metricas([
+            ("Residuos de los hogares", f"{t(pf['total'])} t", f"Toneladas generadas en todo {pf['anio']}."),
+            ("Reciclables", f"{t(pf['reciclables'])} t", "Papel, cartón, plásticos, vidrio, metales y Tetra Pak."),
+            ("Por persona", f"{pf['kg_hab_dia']:.2f} kg", "Basura que genera cada habitante al día."),
+            ("Recuperado por el piloto", f"{ind['kg'] / 1000:.2f} t", "Lo que registró Minka en el mes, con datos sintéticos."),
+        ], destacar=1)
+        st.write("")
+        izq, der = st.columns([3, 2], gap="large")
+        with izq:
+            st.markdown("#### ¿Qué materiales reciclables hay en esa basura?")
+            st.markdown(ui.barras([(g, v, f"{v / pf['total'] * 100:.1f} % de todos los residuos del hogar")
+                                   for g, v in sorted(pf["por_grupo"].items(), key=lambda x: -x[1])], unidad="t"),
+                        unsafe_allow_html=True)
+        with der:
+            st.markdown("#### ¿Crece la basura cada año?")
+            s = minam.serie(gen, DISTRITO)
+            st.markdown(ui.barras([(str(int(r.anio)), r.toneladas, "") for r in s.itertuples()], unidad="t",
+                                  destacar=str(int(s.anio.max()))), unsafe_allow_html=True)
+            st.markdown(f'<p class="nota">Toneladas de residuos domiciliarios por año, según la Plataforma Nacional de '
+                        f'Datos Abiertos del MINAM (corte del 12/12/2024).</p>', unsafe_allow_html=True)
 
 
 # ───────────────────────────────────────────────────────── empresa
 INVIERTEN = [
-    ("Coca-Cola Perú y Arca Continental Lindley", "Mantienen 25 % de PET reciclado en sus botellas y se comprometieron "
-     "con el MINAM a aliarse con gobiernos locales para programas de segregación. Ya usaron QR en una campaña con Tambo.",
+    ("Coca-Cola Perú y Arca Continental Lindley", "botella", "Mantienen 25 % de PET reciclado en sus botellas y se "
+     "comprometieron con el MINAM a aliarse con gobiernos locales para programas de segregación.",
      "https://www.revistaeconomia.com/minam-y-produce-reconocen-a-las-primeras-empresas-que-cumplieron-al-100-con-el-acuerdo-de-produccion-limpia-en-materia-de-residuos-solidos/"),
-    ("Grupo AJE", "Cielo Alcalina usa botellas 100 % recicladas y anunció una planta de reciclaje de PET en Huaral "
-     "de 900 toneladas al mes, que necesitará abastecimiento verificable.",
+    ("Grupo AJE", "planta", "Cielo Alcalina usa botellas 100 % recicladas y la empresa instaló puntos de reciclaje de "
+     "botellas PET en estaciones del Metro de Lima.",
      "https://www.corresponsables.com/per/actualidad/grupo-aje-minam-ylinea-1-del-metro-de-lima-instalan-13-puntos-de-reciclaje-de-botellas-pet-en-las-principales-estaciones/"),
-    ("Backus", "Más del 85 % de sus productos usa envases retornables o reciclados y tiene programas con recicladores "
-     "para latas y vidrio.", "https://peru21.pe/colab21/heroes-del-reciclaje-por-una-cultura-empresarial-sostenible"),
-    ("SMI (San Miguel Industrias)", "Opera la planta de reciclaje de PET más grande del Perú y compra botellas a "
-     "recicladores formales.", "https://www.revistaeconomia.com/?p=59624"),
-    ("Supermercados Peruanos", "Su movimiento Recicla Consciente reúne a más de 30 empresas, el MINAM y municipalidades. "
-     "Sería un canal para canjear EcoPuntos.", "https://www.revistaeconomia.com/recicla-consciente-el-movimiento-de-supermercados-peruanos-que-acerca-a-mas-personas-al-reciclaje/"),
-    ("Ministerio del Ambiente", "Como ente rector, firma Acuerdos de Producción Limpia con empresas que incluyen alianzas "
-     "con gobiernos locales para la segregación en la fuente.", "https://www.revistaeconomia.com/minam-y-produce-reconocen-a-las-primeras-empresas-que-cumplieron-al-100-con-el-acuerdo-de-produccion-limpia-en-materia-de-residuos-solidos/"),
+    ("Backus", "lata", "Más del 85 % de sus productos usa envases retornables o reciclados y tiene programas con "
+     "recicladores para latas y vidrio.", "https://peru21.pe/colab21/heroes-del-reciclaje-por-una-cultura-empresarial-sostenible"),
+    ("SMI (San Miguel Industrias)", "planta", "Opera la planta de reciclaje de PET más grande del Perú y compra botellas "
+     "a recicladores formales.", "https://www.revistaeconomia.com/?p=59624"),
+    ("Supermercados Peruanos", "carrito", "Su movimiento Recicla Consciente reúne a más de 30 empresas, el MINAM y "
+     "municipalidades. Podría ser un canal para canjear EcoPuntos.",
+     "https://www.revistaeconomia.com/recicla-consciente-el-movimiento-de-supermercados-peruanos-que-acerca-a-mas-personas-al-reciclaje/"),
+    ("Ministerio del Ambiente", "muni", "Como ente rector, firma Acuerdos de Producción Limpia con empresas que incluyen "
+     "alianzas con gobiernos locales para la segregación en la fuente.",
+     "https://www.revistaeconomia.com/minam-y-produce-reconocen-a-las-primeras-empresas-que-cumplieron-al-100-con-el-acuerdo-de-produccion-limpia-en-materia-de-residuos-solidos/"),
 ]
 
 
 def empresa():
     estilo.portada("Para empresas", "Tus envases, <em class='resalte'>de vuelta y verificados</em>",
-                   "Solo cuentan los envases de tus marcas. Mira cuántos kilos se recuperaron, en qué sectores conviene "
-                   "invertir y descarga el certificado de trazabilidad para tus metas de material reciclado.")
+                   "Solo cuentan los envases de tus marcas. Mira cuántos kilos se recuperaron, en qué distritos y sectores "
+                   "conviene invertir y descarga el certificado de trazabilidad para tus metas de material reciclado.")
     estilo.guia("vera", "Cada kilo que ves aquí lo separó un vecino y lo validó un reciclador.")
-    nombre = st.pills("Empresa", list(EMPRESAS), default=list(EMPRESAS)[0], key="emp") or list(EMPRESAS)[0]
+    estilo.como_usar([
+        ("Elige tu empresa", "Toca el nombre de tu empresa. Verás las marcas que cuentan para tu indicador."),
+        ("Revisa lo recuperado", "Kilos de tus marcas que los vecinos devolvieron y los recicladores validaron."),
+        ("Decide dónde invertir", "Compara distritos con datos reales del MINAM y los sectores del piloto."),
+        ("Descarga tu certificado", "Un archivo sin datos personales para tus reportes de sostenibilidad."),
+    ])
+    nombre = st.pills("Tu empresa", list(EMPRESAS), default=list(EMPRESAS)[0], key="emp") or list(EMPRESAS)[0]
     mes = elegir_mes("mes_emp")
     marcas = EMPRESAS[nombre]
-    st.markdown("Marcas que cuentan para tu indicador  " + " ".join(f'<span class="etiqueta clara">{m}</span>' for m in marcas),
-                unsafe_allow_html=True)
+    st.markdown("<b>Marcas que cuentan para tu indicador</b><br>" + " ".join(
+        f'<span class="etiqueta clara">{m}</span>' for m in marcas), unsafe_allow_html=True)
 
     todo = con_puntos(entregas_todas()).merge(padron[["codigo", "sector"]], on="codigo")
     todo["marca"] = todo["marca"].fillna(SIN_MARCA)
     del_mes = todo[(todo.mes == mes) & todo.bien_segregado]
     e = del_mes[del_mes.marca.isin(marcas)]
     ajenas = del_mes[del_mes.material.isin(e.material.unique()) & ~del_mes.marca.isin(marcas)]
+    st.write("")
+    estilo.metricas([
+        ("Kilos de tus marcas", f"{e.kg.sum():,.1f} kg", "Envases de tus marcas validados por un reciclador."),
+        ("Hogares que los devolvieron", f"{e.codigo.nunique()}", "Viviendas distintas que entregaron tus envases."),
+        ("Recojos verificados", f"{e.id_entrega.nunique()}", "Cada recojo tiene fecha, sector y reciclador."),
+        ("Kilos de otras marcas", f"{ajenas.kg.sum():,.1f} kg", "Del mismo material, pero no suman a tu indicador."),
+    ], destacar=0)
 
-    k = st.columns(4)
-    k[0].metric("Kilos de tus marcas", f"{e.kg.sum():,.1f}")
-    k[1].metric("Hogares que los devolvieron", f"{e.codigo.nunique()}")
-    k[2].metric("Recojos verificados", f"{e.id_entrega.nunique()}")
-    k[3].metric("Kilos de otras marcas", f"{ajenas.kg.sum():,.1f}", "no suman a tu indicador", delta_color="off")
+    if datos_minam:
+        comp = datos_minam[0]
+        grupos = sorted({minam.DE_MATERIAL[m] for m in MATERIALES_EMPRESA[nombre]})
+        pot = minam.potencial(comp, grupos)
+        estilo.seccion("Dónde invertir en Lima", "Distritos con más envases de tu tipo",
+                       f"Según los datos abiertos del MINAM ({minam.anio_reciente(comp)}), estos distritos generan más "
+                       f"toneladas al año de {minam.en_texto(grupos)}, que son los materiales de tus marcas. "
+                       f"Son los lugares donde una campaña de reciclaje puede recuperar más.")
+        st.markdown(ui.ranking(pot, "distrito", "toneladas", "detalle", "t al año"), unsafe_allow_html=True)
 
-    estilo.seccion("Dónde invertir", "Sectores que más devuelven tus envases")
+    estilo.seccion("Dentro del piloto", "Sectores de Lurigancho-Chosica que más devuelven tus envases",
+                   "Kilos de tus marcas por cada hogar inscrito en el sector. Mientras más alto, más rinde cada sol "
+                   "invertido en una campaña.")
     inscritas = padron[padron.inscrito].groupby("sector").codigo.size()
     rank = (e.groupby("sector").agg(kg=("kg", "sum"), hogares=("codigo", "nunique"))
             .reindex(inscritas.index, fill_value=0).assign(inscritas=inscritas).reset_index())
@@ -416,12 +591,12 @@ def empresa():
     with der:
         mejor = rank.iloc[0].sector
         st.markdown(estilo.tarjeta(f"Empieza por {mejor}", "Es el sector que más envases de tus marcas devuelve por "
-                                   "hogar. Una campaña ahí rinde más por cada sol invertido.", numero="1.º"),
-                    unsafe_allow_html=True)
+                                   "hogar. Una campaña ahí rinde más por cada sol invertido.", numero="1.º",
+                                   unidad="sector recomendado"), unsafe_allow_html=True)
 
-    estilo.seccion("Para tus reportes", "Certificado de trazabilidad")
-    st.markdown('<p class="nota">Totales por distrito, sector, material y marca. Nunca incluye nombres ni direcciones.</p>',
-                unsafe_allow_html=True)
+    estilo.seccion("Para tus reportes", "Certificado de trazabilidad",
+                   "Resume cuántos kilos de cada marca se recuperaron, en qué sector y en cuántos recojos. Nunca incluye "
+                   "nombres ni direcciones de los vecinos.")
     cert = (e.assign(Distrito="Lurigancho-Chosica", Material=e.material.map(lambda x: MATERIALES[x]["nombre"]))
             .groupby(["Distrito", "sector", "Material", "marca"])
             .agg(Recojos=("id_entrega", "nunique"), Hogares=("codigo", "nunique"), Kilos=("kg", "sum")).reset_index()
@@ -429,28 +604,98 @@ def empresa():
     cert["Kilos"] = cert.Kilos.round(2)
     st.markdown(ui.tabla(cert, alto=340), unsafe_allow_html=True)
     st.write("")
-    st.download_button("Descargar certificado en CSV", cert.to_csv(index=False).encode("utf-8-sig"),
+    st.download_button("Descargar certificado (CSV)", cert.to_csv(index=False).encode("utf-8-sig"),
                        file_name=f"certificado-trazabilidad-{mes}.csv", mime="text/csv", type="primary")
 
-    estilo.seccion("Mercado y Estado", "Quiénes ya invierten en reciclaje en el Perú")
-    st.markdown('<p class="nota">Información pública sobre clientes potenciales y actores públicos. No existe alianza con '
-                'ninguno de ellos.</p>', unsafe_allow_html=True)
-    for fila in [INVIERTEN[:3], INVIERTEN[3:]]:
-        estilo.fila_tarjetas([estilo.tarjeta(n, f'{t} <a href="{u}" target="_blank">Fuente</a>') for n, t, u in fila])
+    estilo.seccion("Mercado y Estado", "¿Quiénes ya invierten en reciclaje en el Perú?",
+                   "Información pública sobre clientes potenciales y actores públicos. No existe alianza con ninguno de "
+                   "ellos.")
+    colores = [P["celeste"], P["mostaza"], P["agua"], P["tinta"], P["celeste"], P["mostaza"]]
+    for fila in [list(zip(INVIERTEN[:3], colores[:3])), list(zip(INVIERTEN[3:], colores[3:]))]:
+        cols = st.columns(3, gap="medium")
+        for c, ((n, dib, txt, url), color) in zip(cols, fila):
+            c.markdown(f'''<div class="noticia"><div class="img" style="background:{color}">
+                {ui.dibujo(dib, color, 84, fondo=False)}</div><div class="cuerpo"><div class="tit">{n}</div>
+                <div class="txt">{txt}</div><a href="{url}" target="_blank" class="medio"
+                style="display:inline-block;margin-top:.6rem">Ver la fuente</a></div></div>''', unsafe_allow_html=True)
         st.write("")
+
+
+# ───────────────────────────────────────────────────────── únete
+def unete():
+    estilo.portada("Únete a Minka", "Súmate a la <em class='resalte'>minka del reciclaje</em>",
+                   "Cada actor entra a Minka de una forma distinta. Elige tu perfil, completa el formulario y te "
+                   "contactaremos.")
+    st.markdown('<p class="nota">En esta demostración los formularios no envían datos a ningún servidor. Lo que escribas '
+                'solo se muestra en tu pantalla.</p>', unsafe_allow_html=True)
+    estilo.seccion("Así se identifica cada actor", "¿Cómo sabemos quién recicla y quién recoge?")
+    estilo.fila_tarjetas([
+        estilo.tarjeta("Vecino", "Entra con su código de contribuyente, que figura en su recibo de arbitrios. Así cada "
+                       "recojo se suma a la vivienda correcta y la municipalidad aplica el descuento.", paso="1"),
+        estilo.tarjeta("Reciclador", "Está registrado en su municipalidad, como manda la Ley 29419, y valida cada ticket "
+                       "con su carné. Su código queda en cada recojo.", paso="2"),
+        estilo.tarjeta("Municipalidad", "Usa una cuenta institucional para ver su tablero y descargar el padrón. El plan "
+                       "municipal es gratuito.", paso="3"),
+        estilo.tarjeta("Empresa", "Usa una cuenta corporativa para ver los envases de sus marcas y descargar sus "
+                       "certificados de trazabilidad.", paso="4"),
+    ])
+    estilo.seccion("Formulario", "¿Con qué perfil te unes?")
+    perfil = st.segmented_control("Elige tu perfil", ["Soy vecino", "Soy reciclador", "Soy municipalidad", "Soy empresa"],
+                                  default="Soy vecino", key="perfil_unete") or "Soy vecino"
+    with st.form(f"form_{perfil}", clear_on_submit=False):
+        if perfil == "Soy vecino":
+            nombre = st.text_input("Nombre y apellido")
+            c1, c2 = st.columns(2)
+            distrito = c1.text_input("Distrito", placeholder="Por ejemplo, Lurigancho-Chosica")
+            contrib = c2.text_input("Código de contribuyente", help="Está en tu recibo de arbitrios.")
+            st.text_input("Dirección", placeholder="Por ejemplo, Mz. B Lt. 21, Carapongo")
+            st.text_input("Celular para avisarte del recojo (opcional)")
+            mensaje = (f"Gracias, {nombre or 'vecino'}. Enviaremos tu solicitud a la municipalidad de "
+                       f"{distrito or 'tu distrito'}. Cuando te inscriban, entra a Recicla ahora con tu código "
+                       f"{contrib or 'de contribuyente'}.")
+        elif perfil == "Soy reciclador":
+            nombre = st.text_input("Nombre y apellido")
+            c1, c2 = st.columns(2)
+            c1.text_input("Asociación de recicladores")
+            muni = c2.text_input("Municipalidad donde estás registrado")
+            st.text_input("Número de registro municipal o carné")
+            mensaje = (f"Gracias, {nombre or 'compañero reciclador'}. La municipalidad de {muni or 'tu distrito'} "
+                       "verificará tu registro y te enviaremos tu carné digital para validar tickets.")
+        elif perfil == "Soy municipalidad":
+            muni = st.text_input("Municipalidad")
+            c1, c2 = st.columns(2)
+            nombre = c1.text_input("Nombre de contacto")
+            c2.text_input("Cargo", placeholder="Por ejemplo, subgerente de limpieza pública")
+            st.text_input("Correo institucional")
+            st.text_area("¿Tienen una ordenanza de Bono Verde o un programa de segregación?")
+            mensaje = (f"Gracias, {nombre or 'equipo'}. Te escribiremos para agendar una demostración del plan municipal "
+                       f"gratuito para {muni or 'tu municipalidad'}.")
+        else:
+            emp = st.text_input("Empresa")
+            c1, c2 = st.columns(2)
+            nombre = c1.text_input("Nombre de contacto")
+            c2.text_input("Cargo", placeholder="Por ejemplo, coordinadora de sostenibilidad")
+            st.text_input("Correo corporativo")
+            st.pills("Plan de interés", ["Trazabilidad, S/ 150 por tonelada", "Territorio, S/ 2,500 al mes"], key="plan")
+            mensaje = (f"Gracias, {nombre or 'equipo'}. Te enviaremos una propuesta para {emp or 'tu empresa'} con "
+                       "los distritos donde más se recuperan tus envases.")
+        enviado = st.form_submit_button("Enviar solicitud", type="primary", width="stretch")
+    if enviado:
+        st.success(mensaje)
 
 
 # ───────────────────────────────────────────────────────── asistente
 def asistente():
     estilo.portada("Asistente", "Pregúntale a <em class='resalte'>Vera</em>",
-                   "Vera resuelve tus dudas sobre el Bono Verde con lo que dicen las ordenanzas, la ley y la guía "
-                   "de ReciclaGov. Si algo no está en la guía, te lo dice.")
+                   "Vera resuelve tus dudas sobre el Bono Verde y el reciclaje con lo que dicen las ordenanzas, la ley y "
+                   "la guía de Minka. Si algo no está en la guía, te lo dice.")
     izq, der = st.columns([1, 2.4], gap="large")
     with izq:
-        estilo.retrato("vera", "Vera, vecina guía de ReciclaGov")
+        estilo.retrato("vera", "Vera, vecina guía de Minka")
         st.markdown("#### Preguntas frecuentes")
-        for sugerida in ["¿Cuánto descuento me dan?", "¿Cómo separo bien mis residuos?",
-                         "Mi distrito no tiene Bono Verde", "¿Quién paga los premios?", "¿Mis datos están protegidos?"]:
+        for sugerida in ["¿Qué es el Bono Verde?", "¿Cuánto descuento me dan?", "¿Cómo separo bien mis residuos?",
+                         "¿Cuál es mi código de contribuyente?", "Mi distrito no tiene Bono Verde",
+                         "¿Quién paga los premios?", "¿Mis datos están protegidos?"]:
             if st.button(sugerida, width="stretch"):
                 st.session_state.pendiente = sugerida
     with der:
@@ -459,7 +704,7 @@ def asistente():
             texto, fuentes, _ = responder(pregunta)
             st.session_state.chat += [("user", pregunta, []), ("assistant", texto, fuentes)]
         estilo.chat(st.session_state.chat)
-        escrita = st.chat_input("Escribe tu duda sobre el Bono Verde")
+        escrita = st.chat_input("Escríbele a Vera, por ejemplo «Hola» o «¿qué materiales reciben?»")
         if escrita:
             st.session_state.pendiente = escrita
             st.rerun()
@@ -470,25 +715,27 @@ PAG = {
     "inicio": st.Page(inicio, title="Inicio", default=True, url_path="inicio"),
     "muni": st.Page(tu_municipalidad, title="Tu municipalidad", url_path="municipalidad-cercana"),
     "vecino": st.Page(vecino, title="Mi Bono Verde", url_path="vecino"),
-    "reciclador": st.Page(lambda: recicla.reciclador(etiqueta), title="Reciclador", url_path="reciclador"),
+    "reciclador": st.Page(lambda: recicla.reciclador(padron, direccion), title="Reciclador", url_path="reciclador"),
     "municipalidad": st.Page(municipalidad, title="Municipalidad", url_path="municipalidad"),
     "empresa": st.Page(empresa, title="Empresa", url_path="empresa"),
+    "unete": st.Page(unete, title="Únete", url_path="unete"),
     "vera": st.Page(asistente, title="Pregúntale a Vera", url_path="asistente"),
-    "recicla": st.Page(lambda: recicla.recicla_ahora(etiqueta, padron), title="Recicla ahora", url_path="recicla-ahora"),
+    "recicla": st.Page(lambda: recicla.recicla_ahora(padron, direccion), title="Recicla ahora", url_path="recicla-ahora"),
 }
 actual = st.navigation(list(PAG.values()), position="hidden")
 
 
 def barra() -> None:
-    """Barra superior de lado a lado. Logo, secciones al centro y las dos acciones principales a la derecha."""
+    """Barra superior. Logo con su lema, secciones al centro y las dos acciones principales a la derecha."""
     with st.container(key="barra"):
-        cols = st.columns([1.6, .75, 1.25, 1.2, 1, 1.2, .95, 1.75, 1.55], vertical_alignment="center")
+        cols = st.columns([2.1, .8, 1.35, 1.25, 1.05, 1.25, 1, .75, 1.75, 1.55], vertical_alignment="center")
         cols[0].markdown(estilo.logo(), unsafe_allow_html=True)
-        for c, k in zip(cols[1:7], ["inicio", "muni", "vecino", "reciclador", "municipalidad", "empresa"]):
-            c.page_link(PAG[k])
-        with cols[7], st.container(key="nav-vera"):
+        for c, k in zip(cols[1:8], ["inicio", "muni", "vecino", "reciclador", "municipalidad", "empresa", "unete"]):
+            with c:
+                st.page_link(PAG[k])
+        with cols[8], st.container(key="nav-vera"):
             st.page_link(PAG["vera"], icon=":material/chat_bubble:")
-        with cols[8], st.container(key="nav-recicla"):
+        with cols[9], st.container(key="nav-recicla"):
             st.page_link(PAG["recicla"], icon=":material/recycling:")
 
 

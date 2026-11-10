@@ -1,20 +1,21 @@
-# ReciclaGov
+# Minka
 
-Proyecto final de la Diplomatura de Ciencia de Datos (Q-Lab PUCP). Startup que digitaliza el Bono Verde
+Proyecto final de la Diplomatura de Ciencia de Datos (Q-Lab PUCP). Startup (antes ReciclaGov) que digitaliza el Bono Verde
 municipal (artículo 70 del D. L. 1278): el reciclador registra cada recojo, el vecino ve sus EcoPuntos y la
 municipalidad descarga el padrón de beneficiarios del descuento en arbitrios.
 
 ## Cómo correr
 
 ```
-uv run --python 3.12 --with-requirements requirements.txt streamlit run app/streamlit_app.py
+uv run --python 3.12 --with-requirements requirements.txt python -m streamlit run app/streamlit_app.py
 ```
 
 ## Estructura
 
-- `app/streamlit_app.py`: la app (tres pestañas: Reciclador, Vecino, Municipalidad).
+- `app/streamlit_app.py`: la app (inicio, tu municipalidad, recicla ahora, reciclador, mi Bono Verde, municipalidad, empresas y Vera).
 - `ai/extraer.py`: salidas estructuradas con Gemini (Pydantic) y extractor de reglas de respaldo.
-- `backend/`: reglas del bono, cálculos del padrón y contexto de datos abiertos del MINAM.
+- `backend/`: reglas del bono, cálculos del padrón y datos abiertos del MINAM recortados a Lima (`backend/minam.py`).
+- Identidad visual en `app/estilo.py`: paleta celeste, amarillo y marfil, texto en azul petróleo #17414F, Montserrat.
 - `scripts/`: preparación del mapa y generación de datos sintéticos.
 - `data/`: solo datos públicos o sintéticos. Nunca datos personales reales.
 - `docs/research/`: notas de las conversaciones con usuarios.
