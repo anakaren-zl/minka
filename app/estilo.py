@@ -414,6 +414,27 @@ iframe { border-radius: 20px; }
 .premio.listo .pt { background: #6DBE45; color: #FFFFFF; }
 .premio .cuerpo { flex: 1; }
 .qr-ok { background: #FFFFFF; border: 2px solid #6DBE45; border-radius: 16px; padding: .8rem 1rem; font-weight: 600; }
+/* ---------- celular ---------- */
+@media (max-width: 900px) {
+  .st-key-barra { padding: .4rem .6rem; }
+  .st-key-barra [data-testid="stHorizontalBlock"] { overflow-x: auto; scrollbar-width: none; justify-content: flex-start; }
+  .st-key-barra [data-testid="stHorizontalBlock"]::-webkit-scrollbar { display: none; }
+  .st-key-barra [data-testid="stColumn"] { flex: 0 0 auto !important; width: auto !important; min-width: auto !important; }
+  .st-key-barra [data-testid="stPageLink"] p { font-size: .82rem; }
+  .marca-logo .lema { display: none; }
+  .marca-logo .nombre { font-size: 1.45rem; margin-right: .4rem; }
+  .block-container { padding-top: 5rem; padding-left: 1rem; padding-right: 1rem; }
+  .como .grid, .valores, .planes, .franja, .mosaico .grid { grid-template-columns: 1fr !important; }
+  .historia, .founder { grid-template-columns: 1fr; text-align: left; }
+  .founder img { width: 140px !important; }
+  .video-portada { min-height: 420px; }
+  .video-portada h1, .portada h1 { font-size: 2.1rem; }
+  .video-portada .contenido, .portada { padding: 1.6rem; }
+  .ticket { flex-direction: column; text-align: center; }
+  .guia .globo { display: none; }
+  .guia .cara { width: 64px; height: 64px; }
+  .plan.top { transform: none; }
+}
 </style>
 """.replace("__RUIDO__", RUIDO).replace(
     "__PATRON__", "data:image/svg+xml;base64," + base64.b64encode((ASSETS / "patron.svg").read_bytes()).decode())
