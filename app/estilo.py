@@ -414,8 +414,21 @@ iframe { border-radius: 20px; }
 .premio.listo .pt { background: #6DBE45; color: #FFFFFF; }
 .premio .cuerpo { flex: 1; }
 .qr-ok { background: #FFFFFF; border: 2px solid #6DBE45; border-radius: 16px; padding: .8rem 1rem; font-weight: 600; }
+/* ---------- menú hamburguesa (solo en celular) ---------- */
+.st-key-nav-hamb { display: none !important; }
+.st-key-nav-hamb button { border-radius: 14px !important; border: 2px solid #BFD37A !important; background: #FFFFFF !important;
+  min-height: 2.6rem; }
+[data-testid="stPopoverBody"] [data-testid="stPageLink"] a { border-radius: 12px; padding: .5rem .8rem; }
+[data-testid="stPopoverBody"] [data-testid="stPageLink"] a:hover { background: #E7F1D2; }
+[data-testid="stPopoverBody"] [data-testid="stPageLink"] p { font-weight: 600; color: #1E4D3A !important; }
+
 /* ---------- celular ---------- */
 @media (max-width: 900px) {
+  .st-key-nav-hamb { display: block !important; }
+  [class*="st-key-navsec-"], .st-key-nav-vera { display: none !important; }
+  .st-key-barra [data-testid="stHorizontalBlock"] { overflow-x: visible !important; justify-content: space-between !important; }
+  .st-key-barra [data-testid="stColumn"]:has([class*="st-key-navsec-"]), .st-key-barra [data-testid="stColumn"]:has(.st-key-nav-vera) {
+    display: none !important; }
   .st-key-barra { padding: .4rem .6rem; }
   .st-key-barra [data-testid="stHorizontalBlock"] { overflow-x: auto; scrollbar-width: none; justify-content: flex-start; }
   .st-key-barra [data-testid="stHorizontalBlock"]::-webkit-scrollbar { display: none; }

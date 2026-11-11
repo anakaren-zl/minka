@@ -185,6 +185,10 @@ La demo emplea datos reales y datos sintéticos. Por un lado, son reales las ord
 | **3. El reciclador valida la entrega** | **4. El vecino revisa su Bono Verde** |
 | ![Entrega validada](docs/captura_3_reciclador.png) | ![Mi Bono Verde](docs/captura_4_bono.png) |
 
+### Pruebas con usuarios
+
+La aplicación publicada fue probada por dos personas ajenas a su desarrollo. La primera, en computadora, señaló que no entendía qué hacer en cada sección, razón por la cual se incorporaron instrucciones paso a paso, el ingreso con el código de contribuyente y explicaciones de cada cifra. La segunda, en celular, sugirió un menú hamburguesa, que ahora reemplaza a la barra superior en pantallas pequeñas. El detalle se encuentra en [`docs/pruebas_usuarios.md`](docs/pruebas_usuarios.md).
+
 ### Arquitectura
 
 ```mermaid

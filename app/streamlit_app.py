@@ -834,18 +834,23 @@ actual = st.navigation(list(PAG.values()), position="hidden")
 
 
 def barra() -> None:
-    """Barra superior. Logo con su lema, secciones al centro y las dos acciones principales a la derecha."""
+    """Barra superior. En computadora muestra todas las secciones; en celular, un menú hamburguesa."""
+    secciones = ["inicio", "muni", "vecino", "reciclador", "municipalidad", "empresa", "unete"]
     with st.container(key="barra"):
-        cols = st.columns([2.1, .8, 1.35, 1.25, 1.05, 1.25, 1, .75, 1.75, 1.55], vertical_alignment="center")
+        cols = st.columns([2.1, .8, 1.35, 1.25, 1.05, 1.25, 1, .75, 1.75, 1.55, .6], vertical_alignment="center")
         cols[0].markdown(estilo.logo(), unsafe_allow_html=True)
-        for c, k in zip(cols[1:8], ["inicio", "muni", "vecino", "reciclador", "municipalidad", "empresa", "unete"]):
-            with c:
+        for c, k in zip(cols[1:8], secciones):
+            with c, st.container(key=f"navsec-{k}"):
                 st.page_link(PAG[k])
         with cols[8], st.container(key="nav-vera"):
             st.page_link(PAG["vera"], icon=":material/chat_bubble:")
         with cols[9], st.container(key="nav-recicla"):
             st.page_link(PAG["recicla"], icon=":material/recycling:")
-
+        with cols[10], st.container(key="nav-hamb"):
+            with st.popover("", icon=":material/menu:"):
+                st.markdown("**Menú**")
+                for k in secciones + ["vera", "recicla"]:
+                    st.page_link(PAG[k])
 
 barra()
 actual.run()
