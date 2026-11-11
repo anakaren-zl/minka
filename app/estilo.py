@@ -184,6 +184,7 @@ div[data-testid="stMetricValue"] { font-weight: 900; color: #1E4D3A; }
 iframe { border-radius: 20px; }
 
 /* opciones como botones (sin desplegables) */
+[data-testid="stButtonGroup"] > div { flex-wrap: wrap !important; overflow: visible !important; row-gap: .45rem; }
 [data-testid="stPills"] button, [data-testid="stButtonGroup"] button {
   background: #FFFFFF !important; border: 2px solid #BFD37A !important; color: #1E4D3A !important;
   border-radius: 999px !important; font-weight: 600 !important; }
