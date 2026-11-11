@@ -180,7 +180,7 @@ def inicio():
 
     estilo.seccion("Una sola herramienta, cuatro actores", "Cómo funciona Minka")
     estilo.fila_tarjetas([
-        estilo.tarjeta("El vecino separa", "Registra lo que separó y saca su bolsa la noche anterior, con el adhesivo QR de su casa.", paso="1"),
+        estilo.tarjeta("El vecino separa", "Registra lo que separó y saca su bolsa marcada la noche anterior. Su puerta lleva el sticker de Minka.", paso="1"),
         estilo.tarjeta("El reciclador recoge", "Pasa de madrugada por su ruta. En el centro de acopio escanean, pesan y validan cada bolsa.", paso="2"),
         estilo.tarjeta("La municipalidad premia", "Descarga el padrón para rentas y acredita sus metas del Programa de Incentivos.", paso="3"),
         estilo.tarjeta("La empresa recupera", "Recibe los kilos de sus marcas y financia el bono del reciclador y los premios.", paso="4"),
@@ -218,7 +218,7 @@ def inicio():
          "corazón operativo del sistema."),
         ("empresa", "Empresas", "Productores de envases", "Backus, Arca Continental Lindley, Grupo AJE, CBC, Gloria, "
          "Nestlé, Laive y Alicorp, entre otros."),
-        ("empresa", "Empresas", "Supermercados", "Supermercados Peruanos, Cencosud y Tambo, como posibles canales para "
+        ("empresa", "Comercio", "Bodegas y supermercados", "Bodegas del barrio, Supermercados Peruanos, Cencosud y Tambo, como posibles canales para entregar stickers y bolsas, y para "
          "canjear EcoPuntos."),
         ("academia", "Academia", "Q-Lab PUCP", "Diplomatura de Ciencia de Datos para las Ciencias Sociales y la Gestión "
          "Pública, donde nace el proyecto."),
@@ -350,7 +350,7 @@ def tu_municipalidad():
 
 # ───────────────────────────────────────────────────────── vecino
 PREMIOS = [  # premios de ejemplo, que en la versión final financian las empresas aliadas
-    (300, "Vale de S/ 10", "Para tus compras en supermercados aliados."),
+    (300, "Vale de S/ 10", "Para tus compras en la bodega aliada de tu barrio."),
     (600, "Pack de limpieza ecológica", "Productos para el hogar con envases reciclados."),
     (1000, "Sorteo del mes", "Una entrada al sorteo de una bicicleta entre los vecinos del distrito."),
     (1500, "Vecino destacado", "Reconocimiento público de tu municipalidad como vecino que más recicla."),

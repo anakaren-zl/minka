@@ -581,6 +581,43 @@ def retrato(personaje: str, alt: str) -> None:
     st.markdown(f'<div class="retrato">{imagen(personaje + ".png", alt, radio="0")}</div>', unsafe_allow_html=True)
 
 
+def sticker(codigo: str) -> bytes:
+    """Sticker de puerta «Esta casa recicla con Minka», con el QR de la vivienda, como PNG."""
+    import base64
+    import io
+    from PIL import Image, ImageDraw, ImageFont
+
+    def fuente(tam: int, negrita: bool = True):
+        for ruta in ["/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf" if negrita else
+                     "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"]:
+            try:
+                return ImageFont.truetype(ruta, tam)
+            except OSError:
+                pass
+        return ImageFont.load_default(size=tam)
+
+    W, H = 640, 860
+    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    d.rounded_rectangle([0, 0, W - 1, H - 1], radius=48, fill="#1E4D3A")
+    d.rounded_rectangle([18, 18, W - 19, H - 19], radius=38, outline="#BFD37A", width=4)
+    centro = lambda y, txt, f, color: d.text((W / 2, y), txt, font=f, fill=color, anchor="mm")
+    centro(95, "Esta casa recicla con", fuente(36), "#D0E6A6")
+    grande = fuente(92)
+    ancho_min, ancho_ka = d.textlength("min", font=grande), d.textlength("ka", font=grande)
+    x0 = (W - ancho_min - ancho_ka) / 2
+    d.text((x0, 170), "min", font=grande, fill="#FFFFFF", anchor="lm")
+    d.text((x0 + ancho_min, 170), "ka", font=grande, fill="#6DBE45", anchor="lm")
+    codigo_qr = Image.open(io.BytesIO(base64.b64decode(qr(codigo)))).convert("RGB").resize((380, 380))
+    d.rounded_rectangle([110, 240, 530, 660], radius=28, fill="#FFFFFF")
+    img.paste(codigo_qr, (130, 260))
+    centro(710, f"Vivienda {codigo}", fuente(30), "#FFFFFF")
+    centro(770, "Juntos, cada aporte cuenta", fuente(26, False), "#D0E6A6")
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    return buf.getvalue()
+
+
 def qr(texto: str) -> str:
     """Código QR del ticket digital, como imagen PNG en base64."""
     import io

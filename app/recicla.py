@@ -1,9 +1,9 @@
 """El corazón de Minka: pasar del ticket de papel al ticket digital.
 
 1. El vecino, en «Recicla ahora», ingresa con su código de contribuyente, dice qué separó y saca su bolsa
-   la noche anterior al día de ruta de su sector, identificada con el adhesivo QR de su vivienda.
+   la noche anterior al día de ruta de su sector, con el código de su casa. En la puerta, el sticker «Esta casa recicla con Minka».
 2. El reciclador recoge las bolsas en su ruta de madrugada. En el centro de acopio, el encargado de pesaje
-   de la asociación escanea el adhesivo o el ticket, pesa lo que llegó y lo valida con un solo celular.
+   de la asociación escanea el código de la bolsa o el ticket, pesa lo que llegó y lo valida con un solo celular.
 3. Solo la entrega validada suma al Bono Verde, al padrón municipal y al certificado de la empresa.
 
 Las solicitudes y entregas de la demo viven en st.session_state.
@@ -132,7 +132,7 @@ def recicla_ahora(padron: pd.DataFrame, direccion: dict) -> None:
         ("Ingresa", "Escribe tu código de contribuyente, que está en tu recibo de arbitrios."),
         ("Cuenta lo que separaste", "Marca cuántas botellas, latas o kilos tienes, o escríbelo con tus palabras."),
         ("Saca tu bolsa la noche anterior", "Tu reciclador pasa de madrugada por tu calle en los días de ruta."),
-        ("Identifica tu bolsa", "Pega el adhesivo QR de tu vivienda. En el centro de acopio lo escanean y pesan."),
+        ("Usa tu sticker y tu bolsa", "Tu puerta lleva el sticker de Minka y tu bolsa, el código de tu casa."),
     ], "Así funciona")
 
     estilo.seccion("Paso 1", "Ingresa con tu código de contribuyente")
@@ -177,7 +177,7 @@ def recicla_ahora(padron: pd.DataFrame, direccion: dict) -> None:
                    "El reciclador formalizado de tu sector sigue una ruta fija y pasa de madrugada, desde las 5 de la "
                    "mañana. Saca tu bolsa la noche anterior y te enviaremos un recordatorio por WhatsApp esa tarde.")
     st.markdown('<div class="banda"><b>Tu ruta pasa los martes y los viernes.</b> Saca tu bolsa la noche del lunes '
-                'o del jueves, cerrada y con el adhesivo de tu vivienda a la vista.</div>', unsafe_allow_html=True)
+                'o del jueves, cerrada y con el código de tu casa. Las bolsas que te deja el reciclador ya vienen marcadas.</div>', unsafe_allow_html=True)
     st.write("")
     c1, c2 = st.columns(2)
     dia = c1.date_input("Día de ruta en que dejarás tu bolsa", value=proximo_dia_ruta(), min_value=date.today(),
@@ -208,17 +208,17 @@ def recicla_ahora(padron: pd.DataFrame, direccion: dict) -> None:
         st.write("")
         estilo.ticket(ultimo["id"], f"<p><b>{direccion[ultimo['codigo']]}</b></p><p>{_resumen(ultimo['lineas'])}</p>"
                       f"<p>Recojo el {pd.Timestamp(ultimo['fecha']):%d/%m/%Y}. {_modo(ultimo['turno'])}</p>"
-                      f"<p class='nota'>No necesitas esperar al reciclador. En el centro de acopio escanearán tu adhesivo "
+                      f"<p class='nota'>No necesitas esperar al reciclador. En el centro de acopio escanearán el código de tu bolsa "
                       f"o este código y pesarán tu bolsa. Cuando se valide, revisa tus puntos en Mi Bono Verde.</p>",
                       validado=ultimo["estado"] == "validado")
         import base64
         st.write("")
         contrib = padron.set_index("codigo").contribuyente.get(ultimo["codigo"], ultimo["codigo"])
         b1, b2 = st.columns(2)
-        b1.download_button("Descargar el adhesivo QR de mi vivienda", base64.b64decode(estilo.qr(contrib)),
-                           file_name=f"adhesivo-{contrib}.png", mime="image/png", width="stretch",
-                           help="Imprímelo una sola vez y pégalo en tu bolsa o en tu puerta. Si no tienes impresora, "
-                                "la municipalidad te lo entrega al empadronarte.")
+        b1.download_button("Descargar el sticker de mi casa", estilo.sticker(contrib),
+                           file_name=f"sticker-minka-{contrib}.png", mime="image/png", width="stretch",
+                           help="Pégalo en tu puerta. Si no tienes impresora, la municipalidad o la bodega aliada de tu "
+                                "barrio te lo entrega junto con tus primeras bolsas marcadas.")
         b2.download_button("Descargar el código de este ticket", base64.b64decode(estilo.qr(ultimo["id"])),
                            file_name=f"ticket-{ultimo['id']}.png", mime="image/png", width="stretch")
 
@@ -266,19 +266,19 @@ def lo_que_ganas(entregas: pd.DataFrame | None) -> None:
 def reciclador(padron: pd.DataFrame, direccion: dict, entregas: pd.DataFrame | None = None) -> None:
     estilo.portada("Para recicladores y centros de acopio", "Valida cada bolsa <em class='resalte'>en segundos</em>",
                    "Recoge las bolsas en tu ruta de madrugada. En el centro de acopio, el encargado de pesaje de tu "
-                   "asociación escanea el adhesivo de cada vivienda, pesa y valida con un solo celular. No necesitas "
+                   "asociación escanea el código de cada bolsa, pesa y valida con un solo celular. No necesitas "
                    "un celular propio.", fondo="vidrio.jpg")
     estilo.guia("ciclo", "Recojo de madrugada y en el acopio pesamos todo junto. Mi trabajo queda registrado.")
     estilo.identidad("ciclo", f"Ruta de {RECICLADOR[0]} · Centro de acopio de Carapongo", RECICLADOR[1])
     lo_que_ganas(entregas)
     estilo.seccion("En el centro de acopio", "Valida las bolsas del día")
     estilo.como_usar([
-        ("Recoge en tu ruta", "Los vecinos dejan su bolsa la noche anterior con el adhesivo de su vivienda."),
-        ("Escanea", "Escanea el adhesivo o el ticket con la cámara, sube una foto o escribe el código."),
+        ("Recoge en tu ruta", "Los vecinos dejan su bolsa la noche anterior, marcada con el código de su casa."),
+        ("Escanea", "Escanea el código de la bolsa o el ticket con la cámara, sube una foto o escribe el código."),
         ("Pesa y corrige", "Escribe los kilos reales. Si vino mezclado, apaga «Vino bien separado»."),
         ("Valida", "Presiona Validar. El vecino suma puntos y tu trabajo queda registrado."),
     ])
-    pendientes, rapido = st.tabs(["Bolsas con adhesivo o ticket", "Registro rápido sin ticket"])
+    pendientes, rapido = st.tabs(["Bolsas marcadas o con ticket", "Registro rápido sin ticket"])
 
     with pendientes:
         lista = [t for t in st.session_state.solicitudes if t["estado"] == "pendiente"]
@@ -286,10 +286,10 @@ def reciclador(padron: pd.DataFrame, direccion: dict, entregas: pd.DataFrame | N
                                     "Escribir el código"], default="Escribir el código", key="modo_qr") or "Escribir el código"
         buscado = ""
         if modo == "Escribir el código":
-            buscado = st.text_input("Código del adhesivo o del ticket", placeholder="Por ejemplo, C-159376 o T-0101")
+            buscado = st.text_input("Código de la bolsa o del ticket", placeholder="Por ejemplo, C-159376 o T-0101")
         else:
             if modo == "Escanear el QR con la cámara":
-                foto = st.camera_input("Apunta la cámara al adhesivo de la bolsa o al ticket")
+                foto = st.camera_input("Apunta la cámara al código de la bolsa o al ticket")
             else:
                 foto = st.file_uploader("Sube la foto o la captura del código QR", type=["png", "jpg", "jpeg"])
             if foto is not None:

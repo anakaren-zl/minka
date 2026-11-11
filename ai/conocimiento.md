@@ -5,16 +5,19 @@ Minka es una plataforma que conecta a vecinos, recicladores formalizados, munici
 Es el número con el que tu municipalidad te identifica para cobrar los arbitrios y el impuesto predial. Aparece en la parte superior de tu recibo de arbitrios o de tu cuponera. Con ese código entras a Minka, de modo que tus entregas se suman a la vivienda correcta. En esta demostración puedes usar la cuenta de prueba de Vera.
 
 # Cómo uso Recicla ahora
-Primero ingresa tu código de contribuyente. Luego marca cuántas botellas, latas o kilos de cartón separaste, o escríbelo con tus propias palabras. Después elige el día de ruta de tu sector y confirma que tus residuos están limpios y secos. Al final recibes un ticket digital y puedes descargar el adhesivo QR de tu vivienda. La noche anterior al día de ruta, saca tu bolsa cerrada con el adhesivo a la vista. No necesitas esperar al reciclador.
+Primero ingresa tu código de contribuyente. Luego marca cuántas botellas, latas o kilos de cartón separaste, o escríbelo con tus propias palabras. Después elige el día de ruta de tu sector y confirma que tus residuos están limpios y secos. Al final recibes un ticket digital y puedes descargar el sticker de tu casa. La noche anterior al día de ruta, saca tu bolsa cerrada y marcada con el código de tu casa. No necesitas esperar al reciclador.
 
 # Cuándo pasan a recoger mi bolsa, qué días y a qué hora
 El reciclador formalizado de tu sector sigue una ruta fija y pasa a recoger de madrugada, desde las 5 de la mañana, en días fijos. En la demostración, la ruta de Carapongo pasa los martes y los viernes, así que debes sacar tu bolsa la noche del lunes o del jueves. Minka te envía un recordatorio por WhatsApp la tarde anterior. Si prefieres entregarla en mano, puedes elegir la entrega de 8 a 12 horas.
 
 # Por qué saco mi bolsa la noche anterior
-Porque los recicladores salen muy temprano a recorrer su ruta y así no tienes que esperarlos en casa. Basta con dejar tu bolsa cerrada en la puerta, con el adhesivo de tu vivienda a la vista. Es más cómodo para ti y más rápido para el reciclador.
+Porque los recicladores salen muy temprano a recorrer su ruta y así no tienes que esperarlos en casa. Basta con dejar tu bolsa cerrada en la puerta, marcada con el código de tu casa. Es más cómodo para ti y más rápido para el reciclador.
 
-# Qué es el adhesivo QR de mi vivienda
-Es un código QR fijo que identifica tu casa. Lo imprimes una sola vez o te lo entrega la municipalidad cuando te empadronas, y lo pegas en tu bolsa o en tu puerta. En el centro de acopio lo escanean para saber de qué vivienda viene cada bolsa y sumar tus puntos.
+# Qué es el sticker de mi casa y cómo se marca mi bolsa
+Es un sticker que dice Esta casa recicla con Minka y que lleva el código QR de tu vivienda. Lo pegas en tu puerta, así tus vecinos saben que participas y tú recuerdas sacar tu bolsa. Además, las bolsas que te deja el reciclador en cada recojo ya vienen marcadas con el código de tu casa, de modo que en el centro de acopio saben de qué vivienda viene cada bolsa y suman tus puntos. Te los entrega la municipalidad al empadronarte o la bodega aliada de tu barrio.
+
+# Qué hacen las bodegas aliadas
+Las bodegas del barrio pueden sumarse a Minka como puntos de canje de premios, por ejemplo vales para tus compras, y como lugares donde recoger tu sticker y más bolsas marcadas. Así el premio se queda en tu barrio.
 
 # Cómo se identifica el reciclador
 Cada reciclador formalizado está registrado en su municipalidad, como manda la Ley 29419, y recibe un carné con un código. Cuando valida tu ticket, su código queda registrado junto a tu entrega, así se sabe quién recogió qué y su trabajo queda reconocido.
@@ -50,7 +53,7 @@ Son los puntos que ganas por cada kilo que entregas bien separado. Se usan para 
 Minka sigue un modelo mixto. Las empresas que necesitan material reciclado trazable, como las embotelladoras que por la Ley 30884 deben usar PET reciclado en sus botellas, pagan por el certificado de los kilos recuperados. Con ese ingreso se financian los premios y la plataforma, y la municipalidad y los recicladores la usan sin costo.
 
 # Qué hace el reciclador
-El reciclador formalizado recoge las bolsas de su ruta de madrugada y las lleva al centro de acopio de su asociación. Allí, el encargado de pesaje escanea el adhesivo de cada bolsa, pesa los materiales y valida la entrega con un solo celular, de modo que el reciclador no necesita un celular propio. Así su trabajo queda registrado y puede demostrar cuánto recupera.
+El reciclador formalizado recoge las bolsas de su ruta de madrugada y las lleva al centro de acopio de su asociación. Allí, el encargado de pesaje escanea el código de cada bolsa, pesa los materiales y valida la entrega con un solo celular, de modo que el reciclador no necesita un celular propio. Así su trabajo queda registrado y puede demostrar cuánto recupera.
 
 # Qué gana el reciclador con Minka
 Minka no le da más trabajo, sino que le paga mejor por el que ya hace. La municipalidad le retribuye por el servicio de recolección selectiva, porque recibe fondos del Programa de Incentivos del MEF por integrar recicladores formalizados y los registros de Minka son su prueba. Además, las empresas aliadas le pagan un bono de 5 céntimos por cada kilo de sus envases, recibe bolsas más limpias y su historial le ayuda a acceder a equipos de protección y capacitación.
