@@ -412,7 +412,8 @@ def meta_del_barrio(participan: float, sector: str, participo: bool) -> None:
     actual, meta = round(participan * 10), round(META_BARRIO * 10)
     logrado = participan >= META_BARRIO
     estado = ("¡Tu barrio ya alcanzó la meta de este mes!" if logrado else
-              f"Faltan {meta - actual} {'hogar' if meta - actual == 1 else 'hogares'} de cada 10 para alcanzar la meta.")
+              (f"Falta 1 hogar de cada 10 para alcanzar la meta." if meta - actual == 1 else
+               f"Faltan {meta - actual} hogares de cada 10 para alcanzar la meta."))
     casas = "".join(f'<span class="casa{" on" if i < actual else ""}{" meta" if i == meta - 1 else ""}"></span>'
                     for i in range(10))
     st.markdown(f'<div class="meta-barrio"><div class="mb-num"><b>{actual} de cada 10</b> hogares ya reciclaron este '
