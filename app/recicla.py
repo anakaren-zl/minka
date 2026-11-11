@@ -226,6 +226,7 @@ def recicla_ahora(padron: pd.DataFrame, direccion: dict) -> None:
 # ───────────────────────────────────────────────────────── reciclador
 def lo_que_ganas(entregas: pd.DataFrame | None) -> None:
     """El retorno real del reciclador, con el pago municipal como base y el bono de las empresas como alianza."""
+    st.write("")
     estilo.seccion("Tu retorno", "Lo que ganas con Minka",
                    "Minka no te da más trabajo, sino que te paga mejor por el que ya haces y lo hace visible. La "
                    "municipalidad te retribuye por el servicio y las empresas suman un bono por cada kilo de sus envases.")
@@ -270,7 +271,12 @@ def reciclador(padron: pd.DataFrame, direccion: dict, entregas: pd.DataFrame | N
                    "un celular propio.", fondo="vidrio.jpg")
     estilo.guia("ciclo", "Recojo de madrugada y en el acopio pesamos todo junto. Mi trabajo queda registrado.")
     estilo.identidad("ciclo", f"Ruta de {RECICLADOR[0]} · Centro de acopio de Carapongo", RECICLADOR[1])
+    validar_bolsas(padron, direccion)
     lo_que_ganas(entregas)
+
+
+def validar_bolsas(padron: pd.DataFrame, direccion: dict) -> None:
+    """Validación en el centro de acopio. Va antes de «Lo que ganas», porque primero se pesa y luego se gana."""
     estilo.seccion("En el centro de acopio", "Valida las bolsas del día")
     estilo.como_usar([
         ("Recoge en tu ruta", "Los vecinos dejan su bolsa la noche anterior, marcada con el código de su casa."),
@@ -286,7 +292,9 @@ def reciclador(padron: pd.DataFrame, direccion: dict, entregas: pd.DataFrame | N
                                     "Escribir el código"], default="Escribir el código", key="modo_qr") or "Escribir el código"
         buscado = ""
         if modo == "Escribir el código":
-            buscado = st.text_input("Código de la bolsa o del ticket", placeholder="Por ejemplo, C-159376 o T-0101")
+            buscado = st.text_input("Código de la bolsa o del ticket", value=CUENTA_VERA, key="buscar_bolsa",
+                                    placeholder="Por ejemplo, C-159376 o T-0101",
+                                    help="En esta demostración ya está escrito el código de la casa de Vera.")
         else:
             if modo == "Escanear el QR con la cámara":
                 foto = st.camera_input("Apunta la cámara al código de la bolsa o al ticket")
@@ -307,7 +315,9 @@ def reciclador(padron: pd.DataFrame, direccion: dict, entregas: pd.DataFrame | N
             lista = [t for t in lista if t["id"].upper() == b or (vivienda and t["codigo"] == vivienda)]
         st.markdown(f'<p class="nota">{len(lista)} {"recojo pendiente" if len(lista) == 1 else "recojos pendientes"}.</p>', unsafe_allow_html=True)
         if not lista:
-            st.info("No hay bolsas pendientes con ese código. Revisa que esté bien escrito.")
+            st.info("Aún no hay bolsas pendientes de la casa de Vera. Genera una en Recicla ahora y vuelve aquí."
+                    if buscado.strip().upper() == CUENTA_VERA else
+                    "No hay bolsas pendientes con ese código. Revisa que esté bien escrito.")
         for t in lista:
             with st.container(border=True):
                 st.markdown(f'<span class="etiqueta">{t["id"]}</span><span class="etiqueta clara">'
