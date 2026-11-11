@@ -35,11 +35,11 @@ La generación de residuos sólidos constituye uno de los desafíos ambientales 
 
 El Perú refleja este desafío con particular intensidad. En 2016 se generaron más de siete millones de toneladas de residuos sólidos municipales urbanos y, sin embargo, solo se recicló el 1.9 % de los residuos reaprovechables (Ministerio del Ambiente [MINAM], s. f.). Asimismo, la Defensoría del Pueblo (2019) advierte que alrededor del 70 % de los residuos municipales proviene de los domicilios, de modo que el hogar constituye el punto de partida de cualquier política de reciclaje. Los datos abiertos del MINAM confirman esta oportunidad a escala distrital, puesto que en 2023 los hogares de Lurigancho-Chosica generaron 60,193 toneladas de residuos, de las cuales cerca de 24 de cada 100 correspondían a materiales reciclables como papel, cartón, plásticos, vidrio y metales (MINAM, 2024a).
 
-### 3.2 Quién lo sufre
+### 3.2 ¿Quién lo sufre?
 
 El problema afecta a cuatro actores de manera simultánea. En primer lugar, a los **vecinos de los distritos de Lima que cuentan con un programa municipal de segregación en la fuente**, como Lurigancho-Chosica, Villa El Salvador, Villa María del Triunfo o San Juan de Lurigancho, quienes tienen derecho a un descuento en arbitrios que, en la práctica, desconocen o no pueden acreditar. En segundo lugar, a las **subgerencias de limpieza pública y de gestión ambiental de las municipalidades distritales**, que administran el incentivo con tickets físicos, padrones elaborados casa por casa y cruces manuales con el área de rentas. En tercer lugar, a las **empresas productoras de envases**, que deben demostrar la recuperación de material posconsumo y que, no obstante, carecen de información verificable sobre el origen y la marca de lo que se recicla. Finalmente, a los **recicladores formalizados**, cuya labor sostiene buena parte de la recuperación de materiales en las ciudades latinoamericanas, aunque con frecuencia permanece invisible y mal remunerada (Dias, 2016; Medina, 2007).
 
-### 3.3 Cuánto les cuesta
+### 3.3 ¿Cuánto les cuesta?
 
 El artículo 70 del Decreto Legislativo N.° 1278, modificado por el Decreto Legislativo N.° 1501, faculta a las municipalidades a otorgar incentivos a quienes segregan sus residuos (Presidencia de la República del Perú, 2016, 2020). No obstante, el mecanismo funciona en papel. En Villa María del Triunfo, por ejemplo, el vecino debe reunir tickets físicos entregados por el reciclador autorizado para acceder a un descuento de 20 % en el arbitrio de limpieza pública (Municipalidad Distrital de Villa María del Triunfo, 2016). Este procedimiento genera costos concretos para cada actor.
 
@@ -50,7 +50,7 @@ El artículo 70 del Decreto Legislativo N.° 1278, modificado por el Decreto Leg
 | Empresa | No puede demostrar con evidencia verificable cuántos envases de sus marcas se recuperan, lo cual dificulta el cumplimiento de la Ley N.° 30884 y de sus metas de sostenibilidad. |
 | Estado | Carece de información agregada, puesto que el ente rector desconoce qué municipalidades aplican el incentivo y con qué resultados. |
 
-### 3.4 Cómo se resuelve hoy
+### 3.4 ¿Cómo se resuelve hoy?
 
 Actualmente, el incentivo se gestiona mediante tickets de papel, hojas de cálculo elaboradas por cada municipalidad y comunicaciones informales por WhatsApp entre recicladores y supervisores. Por su parte, las empresas recurren a acuerdos con acopiadores que reportan toneladas totales, sin distinguir la marca de los envases.
 
@@ -60,19 +60,25 @@ Actualmente, el incentivo se gestiona mediante tickets de papel, hojas de cálcu
 
 La validación del problema se basó en tres conversaciones semiestructuradas con usuarios potenciales, realizadas el 10 de noviembre de 2026 por llamada telefónica, mensajes de WhatsApp y mensaje de voz. La selección de los participantes siguió un muestreo intencional, orientado a obtener casos ricos en información sobre el fenómeno de estudio (Patton, 2015), de modo que cada conversación representara a uno de los actores del Bono Verde, es decir, al Estado, a la empresa y a la ciudadanía. Asimismo, las preguntas se centraron en experiencias pasadas y conductas concretas, y no en opiniones sobre la solución, con el fin de evitar respuestas complacientes (Fitzpatrick, 2013). Las notas completas se encuentran en [`docs/research/`](docs/research/), mientras que las grabaciones y transcripciones permanecen fuera del repositorio por contener datos personales de terceros.
 
-#### El Estado. Especialista en residuos sólidos del MINAM
+#### El Estado. Gustavo Miranda, especialista en residuos sólidos del MINAM
 
-El especialista confirmó que cada municipalidad administra el Bono Verde según su propio criterio y dentro de su competencia, que las municipalidades no reportan al ministerio cuántos vecinos participan y que, en consecuencia, el ente rector no sabe qué municipalidades aplican el incentivo. Del mismo modo, precisó que el MINAM se concentra en la dimensión normativa y en la capacitación de los gobiernos locales (G. Miranda, comunicación personal, 10 de noviembre de 2026).
+Notas completas en [`01_especialista_minam.md`](docs/research/01_especialista_minam.md).
+
+Gustavo Miranda, especialista en residuos sólidos del Ministerio del Ambiente, quien autorizó la mención de su nombre, confirmó que cada municipalidad administra el Bono Verde según su propio criterio y dentro de su competencia, que las municipalidades no reportan al ministerio cuántos vecinos participan y que, en consecuencia, el ente rector no sabe qué municipalidades aplican el incentivo. Del mismo modo, precisó que el MINAM se concentra en la dimensión normativa y en la capacitación de los gobiernos locales (G. Miranda, comunicación personal, 10 de noviembre de 2026).
 
 Este hallazgo ilustra lo que la literatura sobre políticas públicas denomina la brecha de implementación, es decir, la distancia entre lo que una norma autoriza y lo que efectivamente ocurre cuando su ejecución depende de múltiples actores y niveles de gobierno (Pressman y Wildavsky, 1973). En el caso del Bono Verde, la descentralización de la gestión de residuos otorga autonomía a cada municipalidad, aunque sin un sistema de información común que permita al Estado conocer los resultados. Por ello, Minka genera registros estandarizados y agregados que pueden servir tanto a la municipalidad como al ente rector.
 
-#### La empresa. Coordinadora de sostenibilidad de una empresa cervecera
+#### La empresa. Coordinadora de sostenibilidad de Backus
 
-La coordinadora señaló que a su empresa le interesa que retorne lo que salió al mercado, razón por la cual el material de otras marcas no contribuye a sus indicadores. Asimismo, indicó que la lata es el envase prioritario, que la trazabilidad por marca constituye la principal condición para invertir y que una decisión de inversión requiere información sobre los distritos y las zonas con mayor reciclaje (coordinadora de sostenibilidad de una empresa cervecera, comunicación personal, 10 de noviembre de 2026).
+Notas completas en [`02_sostenibilidad_backus.md`](docs/research/02_sostenibilidad_backus.md).
+
+La coordinadora de sostenibilidad de Backus, empresa que autorizó la mención de su nombre, señaló que a la compañía le interesa que retorne lo que salió al mercado, razón por la cual el material de otras marcas no contribuye a sus indicadores. Asimismo, indicó que la lata es el envase prioritario, que la trazabilidad por marca constituye la principal condición para invertir y que una decisión de inversión requiere información sobre los distritos y las zonas con mayor reciclaje (coordinadora de sostenibilidad de Backus, comunicación personal, 10 de noviembre de 2026).
 
 Este testimonio es coherente con el principio de responsabilidad extendida del productor, según el cual el fabricante asume la responsabilidad por el ciclo de vida completo de sus productos, incluida su etapa posconsumo (Lindhqvist, 2000). La Organización para la Cooperación y el Desarrollo Económicos sostiene que estos sistemas requieren mecanismos confiables de monitoreo y verificación para evitar que los productores financien recuperaciones que no pueden atribuirse a sus envases (Organisation for Economic Co-operation and Development [OECD], 2016). En consecuencia, la conversación invalidó el supuesto inicial de que las empresas pagarían por kilos de material en general y condujo a incorporar la marca en cada registro.
 
 #### La ciudadanía. Vecina de Villa María del Triunfo
+
+Notas completas en [`03_vecina_villa_maria.md`](docs/research/03_vecina_villa_maria.md).
 
 La vecina recordó vagamente que en su distrito existió un descuento por reciclaje, pero afirmó que en su casa no reciclan porque no saben cómo funciona el programa. Además, señaló que la municipalidad no promueve el reciclaje y que el distrito enfrenta problemas recurrentes con el recojo de basura (vecina de Villa María del Triunfo, comunicación personal, 10 de noviembre de 2026).
 
@@ -82,7 +88,7 @@ Este hallazgo coincide con la teoría del comportamiento planificado, que identi
 
 La triangulación de las tres fuentes, recurso que permite contrastar perspectivas distintas sobre un mismo fenómeno (Patton, 2015), revela un mismo vacío desde tres ángulos.
 
-| Actor | Lo que necesita | Lo que falta hoy | Respuesta de Minka |
+| Actor | ¿Qué necesita? | ¿Qué falta hoy? | Respuesta de Minka |
 |---|---|---|---|
 | Estado | Saber quién aplica el incentivo y con qué resultados | Un sistema de información común | Registros estandarizados y agregados por distrito |
 | Empresa | Demostrar la recuperación de sus propios envases | Trazabilidad por marca | Registro de material, marca, sector y reciclador en cada entrega |
@@ -92,7 +98,7 @@ En síntesis, el incentivo existe en la norma, aunque no llega al vecino, no gen
 
 ## 4. Solución e insight
 
-### 4.1 Qué construimos
+### 4.1 ¿Qué construimos?
 
 Minka es una aplicación web que conecta a los cuatro actores del Bono Verde en un solo flujo.
 
@@ -118,7 +124,7 @@ El diseño de Minka se sustenta en tres líneas de la literatura sobre el compor
 
 La revisión de experiencias internacionales y nacionales muestra que los incentivos al reciclaje y la responsabilidad del productor avanzan en distintas regiones, aunque ninguna de ellas articula el incentivo tributario municipal con la trazabilidad por marca.
 
-| Experiencia | Qué hace | Lección para Minka |
+| Experiencia | ¿Qué hace? | Lección para Minka |
 |---|---|---|
 | Unión Europea | El Reglamento (UE) 2025/40 obliga a los Estados miembros a contar con sistemas de depósito y devolución para botellas plásticas y latas de bebidas y a recolectar al menos el 90 % de estos envases a partir de 2029 (Parlamento Europeo y Consejo de la Unión Europea, 2025). | La trazabilidad de los envases y la responsabilidad del productor se convierten en obligaciones regulatorias. |
 | España | RECICLOS, desarrollado por Ecoembes, es un sistema de devolución y recompensa en el que el ciudadano escanea sus latas y botellas con una aplicación web y códigos QR y recibe puntos canjeables por recompensas sociales y ambientales (Ecoembes, 2021). | Las recompensas digitales y la alianza con los municipios son viables a gran escala. |
@@ -137,16 +143,26 @@ Las aplicaciones de reciclaje con puntos premian al vecino con descuentos comerc
 
 **Para la municipalidad.** Obtiene sin costo el padrón de beneficiarios listo para el área de rentas, reduce el trabajo manual y dispone de datos para reportar sus metas ambientales.
 
-**Para la empresa, que es el cliente.** La empresa contrata a Minka por cuatro razones.
+**Para la empresa, que es el cliente.** ¿Por qué una empresa contrataría a Minka? Por cuatro razones.
 
 1. **Cumplimiento normativo.** La Ley N.° 30884 exige que las botellas de PET incorporen material reciclado posconsumo, mientras que el principio de responsabilidad extendida del productor gana terreno en la región, como muestran las normas de Chile y Colombia (Congreso de la República del Perú, 2018; OECD, 2016). Minka le ofrece evidencia verificable de la recuperación de sus propios envases.
 2. **Reportes de sostenibilidad creíbles.** El estándar GRI 306 pide a las organizaciones informar sobre los residuos vinculados con sus actividades y productos, así como sobre su destino (Global Reporting Initiative [GRI], 2020). El certificado de Minka detalla material, marca, sector, fecha y reciclador, sin datos personales.
 3. **Inversión mejor dirigida.** Con los datos abiertos del MINAM, la empresa identifica los distritos de Lima que generan más toneladas de sus materiales y, con los registros del piloto, los sectores donde una campaña rinde más por cada sol invertido.
 4. **Abastecimiento y reputación.** Un flujo trazable de envases posconsumo contribuye al abastecimiento de material reciclado y vincula la marca con un beneficio visible para los vecinos y los recicladores.
 
-**Por qué las empresas pagan y las municipalidades no.** Minka funciona como una plataforma de dos lados, en la que el valor para un grupo de usuarios depende de la participación del otro. En este tipo de mercados, la literatura muestra que conviene subsidiar al lado cuya adhesión es más difícil y cobrar al lado que obtiene mayor beneficio de la red (Rochet y Tirole, 2003). Las municipalidades enfrentan restricciones presupuestales y procesos de contratación lentos y, además, ya asumen el costo fiscal del descuento en arbitrios, de modo que cobrarles frenaría la adopción. Por el contrario, cada municipalidad que se suma aporta vecinos y recicladores que generan los registros por los que pagan las empresas. En consecuencia, el plan municipal gratuito no constituye una pérdida, sino la estrategia que construye la red de datos que la empresa valora, en coherencia con el principio según el cual quien pone el envase en el mercado financia su recuperación (OECD, 2016).
+**¿Por qué una empresa querría aliarse con el sector público?** A primera vista, la gestión de residuos parece un asunto exclusivamente estatal, puesto que la ley asigna a las municipalidades la recolección y la disposición final. Sin embargo, los envases que llegan a los hogares son puestos en el mercado por las empresas, de modo que, sin una alianza, la municipalidad termina financiando con recursos públicos la gestión de residuos que generan productos privados. El principio de responsabilidad extendida del productor corrige precisamente esa asimetría (Lindhqvist, 2000; OECD, 2016). Más allá de recuperar sus envases, la empresa obtiene cinco beneficios de aliarse con las municipalidades a través de Minka.
 
-## 5. Why now
+1. **Acceso al territorio y a escala.** La municipalidad ya cuenta con programas de segregación, padrones de vecinos y recicladores formalizados registrados. Para la empresa, construir por su cuenta una red de recolección casa por casa resultaría más costoso y lento que sumarse a la infraestructura pública existente. La literatura sobre colaboración intersectorial sostiene que estas alianzas surgen cuando ningún sector puede resolver por sí solo un problema público complejo (Bryson et al., 2006).
+2. **Legitimidad y licencia social.** Las organizaciones buscan que sus acciones sean percibidas como deseables y apropiadas por la sociedad, y esa legitimidad resulta más sólida cuando es reconocida por actores públicos (Suchman, 1995). Una campaña respaldada por la municipalidad y validada por recicladores formalizados es más creíble que una iniciativa unilateral de la marca, lo cual reduce el riesgo de ser percibida como un mero ejercicio de imagen.
+3. **Valor compartido.** Según Porter y Kramer (2011), las empresas pueden generar valor económico al mismo tiempo que resuelven problemas sociales. En este caso, el mismo flujo que recupera los envases de la empresa reduce el costo de la limpieza pública, mejora el ingreso de los recicladores y premia al vecino.
+4. **Relación directa con el consumidor.** Los premios que financia la empresa llegan al vecino como un reconocimiento de su marca por reciclar sus envases, lo cual crea un vínculo positivo con el consumidor en su propio barrio, siempre a partir de datos agregados y sin información personal.
+5. **Anticipación regulatoria y participación en la gobernanza.** La gobernanza colaborativa permite que los actores privados participen en la definición de soluciones públicas junto con el Estado (Ansell y Gash, 2008). En el Perú, el MINAM ya promueve Acuerdos de Producción Limpia en los que las empresas se comprometen a articular programas de segregación con los gobiernos locales (Revista Economía, s. f.). Por ello, la empresa que participa hoy en un sistema trazable llega mejor preparada a una eventual regulación de responsabilidad extendida para envases, como las que ya rigen en Chile y Colombia.
+
+En síntesis, la alianza no traslada a la empresa una responsabilidad ajena, sino que le permite asumir de manera eficiente y visible la parte que le corresponde en la gestión de los residuos que sus productos generan.
+
+**¿Por qué pagan las empresas y no las municipalidades?** Minka funciona como una plataforma de dos lados, en la que el valor para un grupo de usuarios depende de la participación del otro. En este tipo de mercados, la literatura muestra que conviene subsidiar al lado cuya adhesión es más difícil y cobrar al lado que obtiene mayor beneficio de la red (Rochet y Tirole, 2003). Las municipalidades enfrentan restricciones presupuestales y procesos de contratación lentos y, además, ya asumen el costo fiscal del descuento en arbitrios, de modo que cobrarles frenaría la adopción. Por el contrario, cada municipalidad que se suma aporta vecinos y recicladores que generan los registros por los que pagan las empresas. En consecuencia, el plan municipal gratuito no constituye una pérdida, sino la estrategia que construye la red de datos que la empresa valora, en coherencia con el principio según el cual quien pone el envase en el mercado financia su recuperación (OECD, 2016).
+
+## 5. Why now. ¿Por qué ahora?
 
 Cuatro condiciones hacen posible esta solución hoy y no hace tres años.
 
@@ -203,7 +219,7 @@ flowchart LR
 | Interfaz | Streamlit | Facilita un despliegue gratuito en Streamlit Community Cloud. |
 | Transcripción de entrevistas | Whisper en la laptop de la autora | Las grabaciones contienen datos personales de terceros, por lo que no debían salir de la computadora local. |
 
-### Cómo correrlo en local
+### ¿Cómo correrlo en local?
 
 ```bash
 git clone https://github.com/anakaren-zl/minka.git
@@ -216,7 +232,7 @@ La aplicación funciona aun sin clave de Gemini, dado que el extractor de reglas
 
 ## 7. Modelo de negocio
 
-### Quién paga
+### ¿Quién paga?
 
 El modelo es mixto. La municipalidad adopta la herramienta sin costo, puesto que la barrera presupuestal y de contratación pública frenaría su adopción, mientras que **las empresas productoras de envases pagan por la trazabilidad de sus propias marcas**. Una parte de ese pago financia premios adicionales para los vecinos.
 
@@ -244,7 +260,7 @@ En los datos sintéticos, cada vivienda inscrita entrega cerca de 9 kg de recicl
 
 ## 8. Herramientas del curso
 
-| Herramienta | Sesión | Dónde está en el repo | Para qué la usa el cliente |
+| Herramienta | Sesión | ¿Dónde está en el repo? | ¿Para qué la usa el cliente? |
 |---|---|---|---|
 | LLM con salidas estructuradas | 08 | [`ai/extraer.py`](ai/extraer.py) | Convierte lo que el vecino o el reciclador escribe con sus palabras en una tabla de material, cantidad y marca. |
 | RAG | 08 | [`ai/asistente.py`](ai/asistente.py), [`ai/conocimiento.md`](ai/conocimiento.md) | Vera responde dudas sobre el Bono Verde citando la sección de la base de conocimiento que utilizó. |
@@ -256,7 +272,7 @@ En los datos sintéticos, cada vivienda inscrita entrega cerca de 9 kg de recicl
 
 Se eligieron estas herramientas debido a que responden a los dos cuellos de botella del problema. Por un lado, las salidas estructuradas reducen la fricción del registro, ya que el vecino no necesita llenar formularios. Por otro lado, los mapas y tableros convierten cada registro en información útil para la municipalidad y para la empresa.
 
-## 9. Qué hizo el agente
+## 9. ¿Qué hizo el agente?
 
 **El agente generó o ayudó a escribir** el código de la aplicación (`app/`), los módulos de inteligencia artificial (`ai/`), la lógica del bono y del catálogo de marcas (`backend/`), los scripts que generan los datos sintéticos y preparan el mapa y los datos del MINAM (`scripts/`), los estilos visuales, la búsqueda de ordenanzas municipales y de literatura, así como la estructura de las notas de investigación y de este README.
 
@@ -316,6 +332,10 @@ El presente proyecto constituye un producto mínimo viable desarrollado en seis 
 ## Referencias
 
 Ajzen, I. (1991). The theory of planned behavior. *Organizational Behavior and Human Decision Processes, 50*(2), 179–211.
+
+Ansell, C., y Gash, A. (2008). Collaborative governance in theory and practice. *Journal of Public Administration Research and Theory, 18*(4), 543–571.
+
+Bryson, J. M., Crosby, B. C., y Stone, M. M. (2006). The design and implementation of cross-sector collaborations. Propositions from the literature. *Public Administration Review, 66*(s1), 44–55.
 
 Congreso de la República del Perú. (2009). *Ley N.° 29419, Ley que regula la actividad de los recicladores*. Diario Oficial El Peruano.
 
@@ -379,15 +399,21 @@ Patton, M. Q. (2015). *Qualitative research and evaluation methods* (4.ª ed.). 
 
 Porter, M. E. (2008). The five competitive forces that shape strategy. *Harvard Business Review, 86*(1), 78–93.
 
+Porter, M. E., y Kramer, M. R. (2011). Creating shared value. *Harvard Business Review, 89*(1-2), 62–77.
+
 Presidencia de la República del Perú. (2016). *Decreto Legislativo N.° 1278, que aprueba la Ley de Gestión Integral de Residuos Sólidos*. Diario Oficial El Peruano.
 
 Presidencia de la República del Perú. (2020). *Decreto Legislativo N.° 1501, que modifica el Decreto Legislativo N.° 1278*. Diario Oficial El Peruano.
 
 Pressman, J. L., y Wildavsky, A. (1973). *Implementation*. University of California Press.
 
+Revista Economía. (s. f.). *MINAM y PRODUCE reconocen a las primeras empresas que cumplieron al 100 % con el Acuerdo de Producción Limpia en materia de residuos sólidos*. https://www.revistaeconomia.com/minam-y-produce-reconocen-a-las-primeras-empresas-que-cumplieron-al-100-con-el-acuerdo-de-produccion-limpia-en-materia-de-residuos-solidos/
+
 Rochet, J.-C., y Tirole, J. (2003). Platform competition in two-sided markets. *Journal of the European Economic Association, 1*(4), 990–1029.
 
 Schultz, P. W. (1999). Changing behavior with normative feedback interventions. A field experiment on curbside recycling. *Basic and Applied Social Psychology, 21*(1), 25–36.
+
+Suchman, M. C. (1995). Managing legitimacy. Strategic and institutional approaches. *Academy of Management Review, 20*(3), 571–610.
 
 Varotto, A., y Spagnolli, A. (2017). Psychological strategies to promote household recycling. A systematic review with meta-analysis of validated field interventions. *Journal of Environmental Psychology, 51*, 168–188.
 

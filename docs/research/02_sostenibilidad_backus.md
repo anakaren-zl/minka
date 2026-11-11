@@ -1,8 +1,8 @@
-# Conversación 2. Coordinadora de sostenibilidad de una empresa cervecera
+# Conversación 2. Coordinadora de sostenibilidad de Backus
 
 | Campo | Detalle |
 |---|---|
-| Persona entrevistada | Coordinadora de sostenibilidad de una empresa cervecera con operaciones en el Perú (identidad reservada) |
+| Persona entrevistada | Coordinadora de sostenibilidad de Backus, empresa cervecera del grupo AB InBev, quien autorizó la mención de la empresa y de su cargo, mas no de su nombre |
 | Fecha | 10 de noviembre de 2026 |
 | Medio | Mensajes de WhatsApp |
 | Registro | Respuesta escrita de la persona entrevistada, de la cual se citan fragmentos textuales |
