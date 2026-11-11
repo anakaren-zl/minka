@@ -128,6 +128,23 @@ Minka es una aplicación web que conecta a los cuatro actores del Bono Verde en 
 
 Asimismo, la aplicación incluye un mapa que informa al vecino si su distrito premia el reciclaje, un asistente conversacional, Vera, que responde dudas sobre el Bono Verde, y una sección de registro en la que cada actor elige su plan y solicita su incorporación. El vecino se identifica con el código de contribuyente de su recibo de arbitrios, mientras que el reciclador lo hace con el carné que le otorga su municipalidad conforme a la Ley N.° 29419 (Congreso de la República del Perú, 2009b).
 
+#### ¿Cómo funcionan el sticker y las bolsas marcadas?
+
+La identificación de cada entrega se resuelve con dos piezas físicas que no exigen al vecino ni al reciclador manipular un celular durante el recojo.
+
+1. **Empadronamiento.** El promotor municipal y el reciclador del sector visitan cada vivienda una sola vez, pegan en la puerta el sticker «Esta casa recicla con Minka», que contiene el código QR de la vivienda, y entregan un primer paquete de bolsas marcadas con ese mismo código. De manera alternativa, el vecino puede descargar el sticker desde la aplicación o recogerlo en una bodega aliada.
+2. **Separación semanal.** El vecino coloca sus reciclables en una bolsa marcada y, si lo desea, registra en la aplicación su contenido y las marcas de los envases. La noche anterior al día de ruta, deja la bolsa en la puerta.
+3. **Recojo de madrugada.** El reciclador recoge la bolsa durante su ruta y deja una bolsa de reposición, también marcada, de modo que el vecino nunca se queda sin bolsas y el reciclador no necesita escanear nada en la calle.
+4. **Validación en el centro de acopio.** El encargado de pesaje escanea el código de cada bolsa, con lo cual Minka identifica la vivienda de origen, pesa cada material y valida la entrega. Solo a partir de ese momento se suman los puntos del vecino, los kilos del reciclador y, cuando corresponde, los envases del certificado de la empresa.
+
+| | Sticker de la puerta | Bolsa marcada |
+|---|---|---|
+| Función | Mostrar que la vivienda participa y recordar al vecino que debe reciclar | Identificar cada bolsa al llegar al centro de acopio |
+| Frecuencia de entrega | Una sola vez | En cada recojo, como bolsa de reposición |
+| ¿Quién la entrega? | La municipalidad, la aplicación o la bodega aliada | El reciclador |
+
+Este diseño contempla además tres situaciones previsibles. En primer lugar, si una bolsa llega sin código, el encargado la registra mediante el registro rápido con el código de contribuyente, y si este se desconoce, el material se recicla aunque no suma puntos. En segundo lugar, el registro previo en la aplicación es opcional, puesto que el dato que determina el beneficio es el peso verificado en el centro de acopio. Finalmente, el código impreso solo identifica la vivienda dentro del sistema y no contiene nombres ni direcciones, en coherencia con la Ley N.° 29733 (Congreso de la República del Perú, 2011). El costo de imprimir stickers y bolsas es reducido y puede asumirlo la municipalidad, con su presupuesto de limpieza pública, o una empresa aliada como parte de su campaña.
+
 ### 4.2 Fundamentos teóricos
 
 El diseño de Minka se sustenta en tres líneas de la literatura sobre el comportamiento de reciclaje.
