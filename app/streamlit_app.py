@@ -180,10 +180,10 @@ def inicio():
 
     estilo.seccion("Una sola herramienta, cuatro actores", "Cómo funciona Minka")
     estilo.fila_tarjetas([
-        estilo.tarjeta("El vecino separa", "Marca lo que separó, elige el día del recojo y recibe un ticket digital con QR.", paso="1"),
-        estilo.tarjeta("El reciclador valida", "Escanea el ticket, pesa lo que recibe y confirma. Su trabajo queda registrado.", paso="2"),
-        estilo.tarjeta("La municipalidad premia", "Descarga el padrón de beneficiarios listo para rentas, sin papeles.", paso="3"),
-        estilo.tarjeta("La empresa recupera", "Recibe los kilos de sus marcas con su origen y financia los premios.", paso="4"),
+        estilo.tarjeta("El vecino separa", "Registra lo que separó y saca su bolsa la noche anterior, con el adhesivo QR de su casa.", paso="1"),
+        estilo.tarjeta("El reciclador recoge", "Pasa de madrugada por su ruta. En el centro de acopio escanean, pesan y validan cada bolsa.", paso="2"),
+        estilo.tarjeta("La municipalidad premia", "Descarga el padrón para rentas y acredita sus metas del Programa de Incentivos.", paso="3"),
+        estilo.tarjeta("La empresa recupera", "Recibe los kilos de sus marcas y financia el bono del reciclador y los premios.", paso="4"),
     ])
 
     res = resumen_viviendas(padron, entregas_todas(), "2026-10", ReglasBono())
@@ -198,8 +198,9 @@ def inicio():
 
     estilo.seccion("Evidencia", "Por qué funciona")
     estilo.fila_tarjetas([
-        estilo.tarjeta("El dinero motiva más", "En dos experimentos en China, el incentivo monetario fue el más efectivo "
-                       "para reciclar (Lu y Wang, 2022).", numero="1.º", unidad="incentivo más efectivo"),
+        estilo.tarjeta("El incentivo motiva, si se cumple", "En China, el incentivo monetario fue el más efectivo para "
+                       "reciclar (Lu y Wang, 2022). En Lima, un bono prometido y no pagado alejó a los vecinos.",
+                       numero="1.º", unidad="incentivo más efectivo"),
         estilo.tarjeta("Ver al vecino también", "Saber cuántos vecinos ya reciclan refuerza el efecto del incentivo "
                        "(Lu y Wang, 2022).", numero="+", unidad="efecto de las normas sociales"),
         estilo.tarjeta("Lo digital multiplica", "Un sistema digital de incentivos en Shanghái aumentó la recolección en una "
@@ -359,8 +360,9 @@ PREMIOS = [  # premios de ejemplo, que en la versión final financian las empres
 def que_puedo_ganar(yo, ahorro: float, acumulados: int, mes: str, faltan: int) -> None:
     """Los dos beneficios del vecino, el descuento en arbitrios y los premios por EcoPuntos."""
     estilo.seccion("Tus beneficios", "¿Qué puedo ganar?",
-                   "Reciclar con Minka te da dos tipos de beneficios. El descuento en arbitrios lo aplica tu "
-                   "municipalidad cada mes, mientras que los EcoPuntos se acumulan y se canjean por premios.")
+                   "Reciclar con Minka te da tres tipos de beneficios. El descuento en arbitrios lo aplica tu "
+                   "municipalidad cada mes, los EcoPuntos se acumulan y se canjean por premios, y los servicios de "
+                   "tu municipalidad los recibes desde el primer recojo.")
     izq, der = st.columns([1, 1.6], gap="large")
     with izq:
         estado = (f"Ya lo ganaste en {MESES[mes].lower()}." if yo.cumple else
@@ -387,6 +389,35 @@ def que_puedo_ganar(yo, ahorro: float, acumulados: int, mes: str, faltan: int) -
                     f'<b>{acumulados:,} EcoPuntos</b> acumulados</div>{"".join(filas)}</div>'
                     f'<p class="nota">Premios de ejemplo. En la versión final los financian las empresas que pagan por la '
                     f'trazabilidad de sus envases.</p>', unsafe_allow_html=True)
+    st.write("")
+    st.markdown('<div class="panel"><div class="et-premios">3. Servicios de tu municipalidad, desde tu primer recojo</div>'
+                '<div class="servicios"><div><b>Bolsa de reposición</b><span>El reciclador te deja una bolsa nueva '
+                'cada vez que recoge la tuya.</span></div><div><b>Recojo de muebles sin trámite</b><span>Pide el recojo '
+                'de muebles y objetos grandes sin pasar por mesa de partes.</span></div><div><b>Plantas para tu casa'
+                '</b><span>Cada dos meses, una planta para los hogares que reciclan.</span></div></div></div>',
+                unsafe_allow_html=True)
+    st.markdown('<div class="banda confianza"><b>Solo te mostramos beneficios que tu municipalidad ya aprobó.</b> Cada '
+                'recojo validado queda registrado con su fecha y su peso, así que tu beneficio no depende de guardar '
+                'tickets de papel.</div>', unsafe_allow_html=True)
+
+
+META_BARRIO = 0.6  # seis de cada diez hogares del sector
+
+
+def meta_del_barrio(participan: float, sector: str, participo: bool) -> None:
+    """Incentivo colectivo, inspirado en la minka. Si el sector llega a la meta, gana todo el barrio."""
+    estilo.seccion("Juntos, cada aporte cuenta", f"La meta de tu barrio, {sector}",
+                   "Cuando seis de cada diez hogares de tu sector reciclan en el mes, todo el barrio gana una jornada de "
+                   "arborización y recojo de objetos voluminosos, financiada por las empresas aliadas.")
+    actual, meta = round(participan * 10), round(META_BARRIO * 10)
+    logrado = participan >= META_BARRIO
+    estado = ("¡Tu barrio ya alcanzó la meta de este mes!" if logrado else
+              f"Faltan {meta - actual} {'hogar' if meta - actual == 1 else 'hogares'} de cada 10 para alcanzar la meta.")
+    casas = "".join(f'<span class="casa{" on" if i < actual else ""}{" meta" if i == meta - 1 else ""}"></span>'
+                    for i in range(10))
+    st.markdown(f'<div class="meta-barrio"><div class="mb-num"><b>{actual} de cada 10</b> hogares ya reciclaron este '
+                f'mes</div><div class="casas">{casas}</div><div class="mb-est">{estado} '
+                f'{"Tú ya eres parte." if participo else "Súmate esta semana."}</div></div>', unsafe_allow_html=True)
 
 
 def vecino():
@@ -428,10 +459,7 @@ def vecino():
     acumulados = int(con_puntos(entregas_todas()).query("codigo == @codigo").puntos.sum())
     que_puedo_ganar(yo, ahorro, acumulados, mes, faltan)
     participan = (barrio.entregas > 0).mean()
-    st.write("")
-    st.markdown(f'<div class="banda"><b>{round(participan * 10)} de cada 10</b> hogares de {yo.sector} ya reciclaron '
-                f'este mes. {"Tú eres parte de ellos." if yo.entregas > 0 else "Súmate esta semana."}</div>',
-                unsafe_allow_html=True)
+    meta_del_barrio(participan, yo.sector, yo.entregas > 0)
 
     izq, der = st.columns(2, gap="large")
     with izq:
@@ -473,6 +501,16 @@ def municipalidad():
                         descuento=c3.slider("Descuento en limpieza pública (%)", 5, 30, 15) / 100)
     res = resumen_viviendas(padron, entregas_todas(), mes, reglas)
     ind = indicadores(res)
+    estilo.fila_tarjetas([
+        estilo.tarjeta("Acredita tus metas", "Viviendas participantes, kilos y recicladores integrados, listos para el "
+                       "Programa de Incentivos del MEF.", paso="1"),
+        estilo.tarjeta("Cumple la ley sin sancionar", "Facilita la segregación que exige el artículo 34 del "
+                       "Decreto Legislativo 1278.", paso="2"),
+        estilo.tarjeta("Recupera la confianza", "Cada beneficio que ofreces queda respaldado por un registro "
+                       "verificable.", paso="3"),
+        estilo.tarjeta("Sin costo", "El plan municipal es gratuito y el padrón sale listo para rentas.", paso="4"),
+    ])
+    st.write("")
     estilo.metricas([
         ("Viviendas inscritas", f"{ind['inscritas']}", "Hogares empadronados en el programa de segregación."),
         ("Participaron", f"{ind['participan']}", "Entregaron al menos una vez en el mes."),
@@ -823,7 +861,7 @@ PAG = {
     "inicio": st.Page(inicio, title="Inicio", default=True, url_path="inicio"),
     "muni": st.Page(tu_municipalidad, title="Tu municipalidad", url_path="municipalidad-cercana"),
     "vecino": st.Page(vecino, title="Mi Bono Verde", url_path="vecino"),
-    "reciclador": st.Page(lambda: recicla.reciclador(padron, direccion), title="Reciclador", url_path="reciclador"),
+    "reciclador": st.Page(lambda: recicla.reciclador(padron, direccion, entregas_todas()), title="Reciclador", url_path="reciclador"),
     "municipalidad": st.Page(municipalidad, title="Municipalidad", url_path="municipalidad"),
     "empresa": st.Page(empresa, title="Empresa", url_path="empresa"),
     "unete": st.Page(unete, title="Únete", url_path="unete"),
