@@ -348,6 +348,47 @@ def tu_municipalidad():
 
 
 # ───────────────────────────────────────────────────────── vecino
+PREMIOS = [  # premios de ejemplo, que en la versión final financian las empresas aliadas
+    (300, "Vale de S/ 10", "Para tus compras en supermercados aliados."),
+    (600, "Pack de limpieza ecológica", "Productos para el hogar con envases reciclados."),
+    (1000, "Sorteo del mes", "Una entrada al sorteo de una bicicleta entre los vecinos del distrito."),
+    (1500, "Vecino destacado", "Reconocimiento público de tu municipalidad como vecino que más recicla."),
+]
+
+
+def que_puedo_ganar(yo, ahorro: float, acumulados: int, mes: str, faltan: int) -> None:
+    """Los dos beneficios del vecino, el descuento en arbitrios y los premios por EcoPuntos."""
+    estilo.seccion("Tus beneficios", "¿Qué puedo ganar?",
+                   "Reciclar con Minka te da dos tipos de beneficios. El descuento en arbitrios lo aplica tu "
+                   "municipalidad cada mes, mientras que los EcoPuntos se acumulan y se canjean por premios.")
+    izq, der = st.columns([1, 1.6], gap="large")
+    with izq:
+        estado = (f"Ya lo ganaste en {MESES[mes].lower()}." if yo.cumple else
+                  f"Te {'falta' if faltan == 1 else 'faltan'} {faltan} {'recojo' if faltan == 1 else 'recojos'} "
+                  f"en {MESES[mes].lower()} para ganarlo.")
+        st.markdown(f'<div class="premio-arb"><div class="et">1. Descuento en arbitrios</div>'
+                    f'<div class="v">S/ {ahorro:.2f}</div><div class="ex">al mes en tu arbitrio de limpieza pública, '
+                    f'por cumplir cuatro recojos bien separados.</div><div class="estado">{estado}</div>'
+                    f'<div class="ex" style="margin-top:.8rem">En un año puedes ahorrar hasta <b>S/ {ahorro * 12:.2f}</b>.'
+                    f'</div></div>', unsafe_allow_html=True)
+    with der:
+        filas = []
+        for pts, nombre, detalle in PREMIOS:
+            avance = min(acumulados / pts, 1)
+            listo = acumulados >= pts
+            filas.append(
+                f'<div class="premio{" listo" if listo else ""}"><div class="pt">{pts:,}<span>pts</span></div>'
+                f'<div class="cuerpo"><div class="barra-top"><span class="barra-etq">{nombre}</span>'
+                f'<span class="barra-val">{"¡Ya puedes canjearlo!" if listo else f"Te faltan {pts - acumulados:,} pts"}'
+                f'</span></div><div class="barra-pista"><div class="barra-relleno" style="width:{avance * 100:.0f}%;'
+                f'background:{P["chispa"] if listo else P["musgo"]}"></div></div><div class="barra-det">{detalle}</div>'
+                f'</div></div>')
+        st.markdown(f'<div class="panel"><div class="et-premios">2. Premios por tus EcoPuntos · llevas '
+                    f'<b>{acumulados:,} EcoPuntos</b> acumulados</div>{"".join(filas)}</div>'
+                    f'<p class="nota">Premios de ejemplo. En la versión final los financian las empresas que pagan por la '
+                    f'trazabilidad de sus envases.</p>', unsafe_allow_html=True)
+
+
 def vecino():
     estilo.portada("Para vecinos", "Mi <em class='resalte'>Bono Verde</em>",
                    "Revisa cuántos puntos llevas, cuánto te falta para tu descuento en arbitrios y cómo va tu barrio.", fondo="separar.jpg")
@@ -356,6 +397,7 @@ def vecino():
         ("Ingresa", "Escribe tu código de contribuyente. En la demostración ya está el de Vera."),
         ("Elige el mes", "Toca el mes que quieres revisar."),
         ("Revisa tu avance", "Cada recojo bien separado suma. Con cuatro al mes, ganas tu descuento."),
+        ("Mira tus premios", "Tus EcoPuntos se acumulan y se canjean por premios."),
     ])
     reglas = ReglasBono()
     codigo = recicla.ingresar(padron, "vec")
@@ -383,7 +425,10 @@ def vecino():
     st.write("")
     st.progress(min(yo.entregas_validas / reglas.entregas_minimas, 1.0),
                 text="Avance hacia tu Bono Verde del mes")
+    acumulados = int(con_puntos(entregas_todas()).query("codigo == @codigo").puntos.sum())
+    que_puedo_ganar(yo, ahorro, acumulados, mes, faltan)
     participan = (barrio.entregas > 0).mean()
+    st.write("")
     st.markdown(f'<div class="banda"><b>{round(participan * 10)} de cada 10</b> hogares de {yo.sector} ya reciclaron '
                 f'este mes. {"Tú eres parte de ellos." if yo.entregas > 0 else "Súmate esta semana."}</div>',
                 unsafe_allow_html=True)
