@@ -120,8 +120,8 @@ En síntesis, el incentivo existe en la norma, aunque no llega al vecino, a vece
 
 Minka es una aplicación web que conecta a los cuatro actores del Bono Verde en un solo flujo.
 
-1. **El vecino** registra los materiales que separó, ya sea marcándolos o describiéndolos con sus propias palabras, e indica la marca de los envases. Luego saca su bolsa la noche anterior al día de ruta de su sector, identificada con el adhesivo QR fijo de su vivienda, de modo que no necesita esperar al reciclador.
-2. **El reciclador formalizado** recoge las bolsas durante su recorrido de madrugada y las lleva al centro de acopio, donde el encargado de pesaje de la asociación escanea cada adhesivo, pesa cada material y valida la entrega con un solo celular. Así, el reciclador no necesita un celular inteligente y su trabajo queda registrado a su nombre.
+1. **El vecino** registra los materiales que separó, ya sea marcándolos o describiéndolos con sus propias palabras, e indica la marca de los envases. Luego saca su bolsa la noche anterior al día de ruta de su sector, de modo que no necesita esperar al reciclador. Cada vivienda participante cuenta con un sticker en la puerta, con la frase «Esta casa recicla con Minka» y el código QR de la vivienda, mientras que las bolsas de reposición que entrega el reciclador ya vienen marcadas con ese mismo código.
+2. **El reciclador formalizado** recoge las bolsas durante su recorrido de madrugada y las lleva al centro de acopio, donde el encargado de pesaje de la asociación escanea el código de cada bolsa, pesa cada material y valida la entrega con un solo celular. Así, el reciclador no necesita un celular inteligente y su trabajo queda registrado a su nombre.
 3. **El vecino** visualiza en la sección Mi Bono Verde lo que puede ganar, es decir, su descuento mensual en arbitrios y los premios que puede canjear con sus EcoPuntos, así como la participación de su barrio.
 4. **La municipalidad** descarga el padrón de beneficiarios listo para el área de rentas y compara el piloto con los residuos reales del distrito según el MINAM.
 5. **La empresa** consulta cuántos kilos de sus propias marcas se recuperaron, en qué distritos de Lima conviene invertir según los datos del MINAM y descarga su certificado de trazabilidad.
@@ -193,18 +193,18 @@ Por esta razón, Minka organiza los beneficios en tres capas y muestra en cada d
 | Capa | Beneficio | ¿Quién lo financia? | ¿Cuándo se activa? |
 |---|---|---|---|
 | 1. Servicio municipal | Recojo en la puerta de la casa, bolsa de reposición en cada recojo, recojo de muebles y objetos voluminosos sin trámite por mesa de partes y entrega periódica de plantas | La municipalidad, con su presupuesto de limpieza pública | Desde el primer día, puesto que no requiere una ordenanza tributaria |
-| 2. Premios por EcoPuntos y meta del barrio | Vales, productos, sorteos y beneficios colectivos para el sector | Las empresas, mediante el plan de trazabilidad | Cuando una empresa cliente opera en el distrito |
+| 2. Premios por EcoPuntos y meta del barrio | Vales canjeables en las bodegas aliadas del barrio, productos, sorteos y beneficios colectivos para el sector | Las empresas, mediante el plan de trazabilidad | Cuando una empresa cliente opera en el distrito |
 | 3. Descuento en arbitrios | Hasta 15 % del arbitrio de limpieza pública | La municipalidad, mediante una ordenanza y un presupuesto aprobados | Solo en distritos con ordenanza vigente, como Lurigancho-Chosica |
 
 #### El vecino. ¿Por qué sacaría su bolsa la noche anterior?
 
-La conducta que Minka busca promover es específica, es decir, que el vecino separe sus envases limpios y saque una bolsa identificada con su adhesivo QR la noche anterior al día de ruta de su sector. A partir de las conversaciones con la vecina de Villa María del Triunfo, con la Municipalidad de Lince y con Tetra Pak, se identificaron las siguientes barreras y la herramienta que responde a cada una.
+La conducta que Minka busca promover es específica, es decir, que el vecino separe sus envases limpios y saque su bolsa marcada con el código de su vivienda la noche anterior al día de ruta de su sector. A partir de las conversaciones con la vecina de Villa María del Triunfo, con la Municipalidad de Lince y con Tetra Pak, se identificaron las siguientes barreras y la herramienta que responde a cada una.
 
 | Barrera que percibe el vecino | Herramienta | ¿Cómo la aplica Minka? |
 |---|---|---|
 | «No tengo tiempo de esperar al reciclador» | Comodidad | Rutas fijas por sector, de modo que basta con sacar la bolsa la noche anterior, sin coordinar horarios. |
-| «Me olvido» | Recordatorio oportuno | Un mensaje de WhatsApp la tarde anterior al día de ruta y el adhesivo en la puerta como recordatorio visible. |
-| «No sé cómo separar» | Información en el lugar de la acción | Instrucciones breves en el propio adhesivo y respuestas de Vera en lenguaje sencillo. |
+| «Me olvido» | Recordatorio oportuno | Un mensaje de WhatsApp la tarde anterior al día de ruta y el sticker en la puerta como recordatorio visible. |
+| «No sé cómo separar» | Información en el lugar de la acción | Instrucciones breves en el propio sticker y respuestas de Vera en lenguaje sencillo. |
 | «¿Y yo qué gano?» | Incentivos en capas | Beneficio de servicio inmediato, premios por EcoPuntos y descuento en arbitrios donde la ordenanza lo permite. |
 | «Ya nos prometieron y no cumplieron» | Credibilidad | Solo se muestran beneficios aprobados y cada recojo validado queda registrado con fecha y peso. |
 | «Nadie más lo hace» | Normas sociales y retroalimentación | El vecino ve cuántos hogares de su sector ya reciclan y cómo se compara con su barrio (Schultz, 1999). |
@@ -212,7 +212,7 @@ La conducta que Minka busca promover es específica, es decir, que el vecino sep
 
 **La meta del barrio.** El nombre de Minka proviene del trabajo comunitario andino basado en la reciprocidad, y esa idea se traduce en un incentivo colectivo. Cada sector tiene una meta mensual de participación, por ejemplo, que seis de cada diez hogares reciclen, y cuando la alcanza todo el barrio recibe un beneficio, como una jornada de arborización, el recojo de objetos voluminosos o la mejora de un parque financiada por una empresa. Este diseño se apoya en la evidencia según la cual las normas de reciprocidad y la confianza entre vecinos sostienen la acción colectiva cuando las personas pueden observar la contribución de los demás (Ostrom, 2000). Además, Cialdini (2003) muestra que los mensajes normativos resultan más eficaces cuando destacan lo que la mayoría sí hace, en lugar de lamentar lo que no hace.
 
-**¿Y si al vecino no le interesa reciclar?** Minka no pretende convencer a todos los vecinos desde el inicio. Según la teoría de la difusión de innovaciones, una práctica nueva es adoptada primero por un grupo reducido de innovadores y de adoptadores tempranos, mientras que la mayoría se suma cuando observa a sus pares obtener resultados (Rogers, 2003). Por ello, la estrategia comienza con los vecinos dispuestos y vuelve visible su participación mediante el adhesivo en la puerta, que funciona al mismo tiempo como compromiso público, como recordatorio y como señal de la norma del barrio (McKenzie-Mohr, 2011). Para el vecino indiferente, la comodidad y la norma social pesan más que un monto de dinero reducido, el cual podría incluso desplazar su motivación cívica si se presenta como un pago (Frey y Oberholzer-Gee, 1997). Por esa razón, la comunicación presenta el descuento como un reconocimiento y no como un precio. Finalmente, el artículo 34 del Decreto Legislativo N.° 1278 ya obliga a los generadores a segregar sus residuos (Presidencia de la República del Perú, 2016), de modo que, cuando la municipalidad apruebe su ordenanza, el incentivo premiará a quien cumple antes y mejor, mientras que Minka facilitará el cumplimiento de quienes aún no participan.
+**¿Y si al vecino no le interesa reciclar?** Minka no pretende convencer a todos los vecinos desde el inicio. Según la teoría de la difusión de innovaciones, una práctica nueva es adoptada primero por un grupo reducido de innovadores y de adoptadores tempranos, mientras que la mayoría se suma cuando observa a sus pares obtener resultados (Rogers, 2003). Por ello, la estrategia comienza con los vecinos dispuestos y vuelve visible su participación mediante el sticker «Esta casa recicla con Minka», que, al igual que los distintivos de vivienda empadronada, funciona al mismo tiempo como compromiso público, como recordatorio y como señal de la norma del barrio (McKenzie-Mohr, 2011). Para el vecino indiferente, la comodidad y la norma social pesan más que un monto de dinero reducido, el cual podría incluso desplazar su motivación cívica si se presenta como un pago (Frey y Oberholzer-Gee, 1997). Por esa razón, la comunicación presenta el descuento como un reconocimiento y no como un precio. Finalmente, el artículo 34 del Decreto Legislativo N.° 1278 ya obliga a los generadores a segregar sus residuos (Presidencia de la República del Perú, 2016), de modo que, cuando la municipalidad apruebe su ordenanza, el incentivo premiará a quien cumple antes y mejor, mientras que Minka facilitará el cumplimiento de quienes aún no participan.
 
 #### El reciclador. ¿Qué gana registrando su trabajo en Minka?
 
@@ -238,12 +238,12 @@ La comunicación sigue tres principios. En primer lugar, los mensajes se basan e
 
 | Fase | Momento | Acciones | Mensaje central | Indicador |
 |---|---|---|---|---|
-| 1. Empadronamiento | Primer mes | Promotores municipales y el reciclador del sector visitan cada vivienda, entregan el adhesivo QR y la primera bolsa, y el vecino firma un compromiso sencillo | «Tu barrio recicla junto. Esta es tu bolsa» | Porcentaje de viviendas con adhesivo |
+| 1. Empadronamiento | Primer mes | Promotores municipales y el reciclador del sector visitan cada vivienda, pegan el sticker en la puerta, entregan las primeras bolsas marcadas y el vecino firma un compromiso sencillo | «Tu barrio recicla junto. Esta es tu bolsa» | Porcentaje de viviendas con sticker |
 | 2. Minka del barrio | Primer mes | Jornada comunitaria con la junta vecinal, en la que se presenta al reciclador por su nombre y se anuncia la meta del sector | «Cuando todos aportamos, todos ganamos» | Asistencia y nuevas inscripciones |
 | 3. Recordatorio y retroalimentación | Cada semana y cada mes | Mensaje de WhatsApp la tarde anterior al día de ruta, reporte mensual del avance personal y del barrio, y aviso impreso en el recibo de arbitrios | «Mañana pasa tu reciclador. Saca tu bolsa esta noche» | Hogares con al menos dos recojos al mes |
 | 4. Reconocimiento | Cada mes | Publicación de los vecinos destacados, del reciclador del mes y de los barrios que cumplieron su meta en Minka y en las redes de la municipalidad | «Tu barrio lo logró» | Hogares que siguen activos a los tres meses |
 
-Los canales previstos son WhatsApp, el recibo de arbitrios, las juntas vecinales, los comedores populares, las parroquias, los mercados y las redes sociales de la municipalidad. Todos ellos se probarán primero en el piloto de diez hogares descrito más adelante, conforme a la recomendación de validar cada estrategia a pequeña escala antes de extenderla (McKenzie-Mohr, 2011).
+Los canales previstos son WhatsApp, el recibo de arbitrios, las juntas vecinales, los comedores populares, las parroquias, los mercados y las redes sociales de la municipalidad. Asimismo, las bodegas del barrio constituyen aliadas potenciales, puesto que pueden funcionar como puntos de canje de los vales, como lugares donde recoger stickers y bolsas marcadas y como mensajeras de confianza, dado que el bodeguero conoce a los vecinos y conversa con ellos a diario. Además, el canje en la bodega mantiene el beneficio dentro de la economía del barrio. Todos ellos se probarán primero en el piloto de diez hogares descrito más adelante, conforme a la recomendación de validar cada estrategia a pequeña escala antes de extenderla (McKenzie-Mohr, 2011).
 
 #### Síntesis. ¿Por qué lo haría cada uno?
 
@@ -285,7 +285,7 @@ La aplicación publicada fue probada por dos personas ajenas a su desarrollo. La
 
 ```mermaid
 flowchart LR
-    V["Vecino"] --> R["Recicla ahora<br/>bolsa la noche anterior<br/>con adhesivo QR"]
+    V["Vecino"] --> R["Recicla ahora<br/>bolsa marcada la noche anterior<br/>sticker en la puerta"]
     RE["Reciclador formalizado"] --> VA["Centro de acopio<br/>escaneo, peso por material y marca"]
     R --> VA
     VA --> B["backend/bono.py<br/>EcoPuntos y reglas del bono"]
@@ -423,7 +423,7 @@ Si bien estas cifras constituyen una aproximación, puesto que no todos los enva
 
 ## ¿Cómo conseguiríamos los primeros 10, 100 y 1,000 usuarios?
 
-**Los primeros 10.** Se iniciará con diez hogares de Carapongo, en Lurigancho-Chosica, distrito que cuenta con una ordenanza de descuento vigente desde 2024, y con un reciclador formalizado del Programa Recicla. Cada hogar recibirá su adhesivo QR y su primera bolsa en una visita conjunta de la founder y del reciclador, conforme a la primera fase del plan de comunicación. La founder acompañará personalmente cada recojo durante el primer mes, con el fin de observar los puntos de fricción y ajustar el producto.
+**Los primeros 10.** Se iniciará con diez hogares de Carapongo, en Lurigancho-Chosica, distrito que cuenta con una ordenanza de descuento vigente desde 2024, y con un reciclador formalizado del Programa Recicla. Cada hogar recibirá su sticker y sus primeras bolsas marcadas en una visita conjunta de la founder y del reciclador, conforme a la primera fase del plan de comunicación. La founder acompañará personalmente cada recojo durante el primer mes, con el fin de observar los puntos de fricción y ajustar el producto.
 
 **Los primeros 100.** Con la evidencia del primer mes, se propondrá a la subgerencia de gestión ambiental de la municipalidad un convenio gratuito para extender el ticket digital a un sector completo, mientras que los recicladores de la asociación invitarán a los vecinos que ya atienden. Al mismo tiempo, se presentará a Backus un certificado piloto de latas recuperadas, dado que la empresa identificó la lata como su envase prioritario.
 
