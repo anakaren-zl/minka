@@ -15,7 +15,7 @@ uv run --python 3.12 --with-requirements requirements.txt python -m streamlit ru
 - `app/streamlit_app.py`: la app (inicio, tu municipalidad, recicla ahora, reciclador, mi Bono Verde, municipalidad, empresas y Vera).
 - `ai/extraer.py`: salidas estructuradas con Gemini (Pydantic) y extractor de reglas de respaldo.
 - `backend/`: reglas del bono, cálculos del padrón y datos abiertos del MINAM recortados a Lima (`backend/minam.py`).
-- Identidad visual en `app/estilo.py`: paleta celeste, amarillo y marfil, texto en azul petróleo #17414F, Montserrat.
+- Identidad visual en `app/estilo.py`: paleta original de verdes y azules (noche #234257, musgo #3E8E63, sol #F2A541), dibujos ecológicos flotando al fondo y logotipo solo con el nombre en Montserrat Black.
 - `scripts/`: preparación del mapa y generación de datos sintéticos.
 - `data/`: solo datos públicos o sintéticos. Nunca datos personales reales.
 - `docs/research/`: notas de las conversaciones con usuarios.

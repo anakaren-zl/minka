@@ -8,17 +8,17 @@ import html
 
 import pandas as pd
 
-NOCHE, MUSGO, SOL, LAGUNA, HOJA = "#17414F", "#2A6F84", "#E5B94F", "#50B6CF", "#A8DCE8"
+NOCHE, MUSGO, SOL, LAGUNA, HOJA = "#1E4D3A", "#3E8E63", "#6DBE45", "#4E9A6E", "#BFD37A"
 
 # íconos simples de cada material, en trazo blanco sobre un círculo de color
 _TRAZO = 'fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"'
 ICONOS = {
     "papel_carton": (NOCHE, f'<path {_TRAZO} d="M14 22 L32 14 L50 22 L50 42 L32 50 L14 42 Z M14 22 L32 30 L50 22 M32 30 V50"/>'),
     "plastico_pet": (LAGUNA, f'<path {_TRAZO} d="M28 12 H36 V18 C42 21 44 26 44 30 V52 H20 V30 C20 26 22 21 28 18 Z M20 36 H44"/>'),
-    "metal": ("#2A6F84", f'<path {_TRAZO} d="M20 16 H44 V48 H20 Z M20 22 H44 M20 42 H44 M27 13 H37"/>'),
+    "metal": ("#4E7A5C", f'<path {_TRAZO} d="M20 16 H44 V48 H20 Z M20 22 H44 M20 42 H44 M27 13 H37"/>'),
     "vidrio": (MUSGO, f'<path {_TRAZO} d="M28 10 H36 V22 C42 25 44 30 44 34 V54 H20 V34 C20 30 22 25 28 22 Z M24 40 H40"/>'),
     "tetrapak": (SOL, f'<path {_TRAZO} d="M20 22 L26 12 H38 L44 22 V52 H20 Z M20 22 H44 M30 12 V6 H36"/>'),
-    "plastico_otro": ("#3A93AB", f'<path {_TRAZO} d="M18 22 H46 L43 52 H21 Z M25 22 C25 12 39 12 39 22"/>'),
+    "plastico_otro": ("#7A9E3B", f'<path {_TRAZO} d="M18 22 H46 L43 52 H21 Z M25 22 C25 12 39 12 39 22"/>'),
 }
 
 
@@ -57,11 +57,11 @@ def barras(filas: list[tuple[str, float, str]], unidad: str = "kg", destacar: st
 
 def ranking(df: pd.DataFrame, etiqueta: str, valor: str, detalle: str, unidad: str) -> str:
     """Ranking con medallas para los tres primeros."""
-    medallas = ["#E5B94F", "#A8DCE8", "#F5D98D"]
+    medallas = ["#6DBE45", "#BFD37A", "#D0E6A6"]
     tope = df[valor].max() or 1
     filas = []
     for i, r in enumerate(df.itertuples()):
-        fondo = medallas[i] if i < 3 else "#D9F0F2"
+        fondo = medallas[i] if i < 3 else "#E7F1D2"
         texto = NOCHE
         filas.append(
             f'<div class="rk"><div class="rk-pos" style="background:{fondo};color:{texto}">{i + 1}</div>'

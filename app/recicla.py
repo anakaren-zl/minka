@@ -75,6 +75,17 @@ def ingresar(padron: pd.DataFrame, clave: str) -> str:
     return codigo
 
 
+def leer_qr(imagen: bytes) -> str:
+    """Lee el código QR de una foto del ticket con OpenCV. Devuelve el texto o una cadena vacía."""
+    import cv2
+    import numpy as np
+    img = cv2.imdecode(np.frombuffer(imagen, np.uint8), cv2.IMREAD_COLOR)
+    if img is None:
+        return ""
+    texto, _, _ = cv2.QRCodeDetector().detectAndDecode(img)
+    return texto.strip()
+
+
 def _kg(material: str, cantidad: float, unidad: str) -> float:
     return round(cantidad if unidad == "kg" else cantidad * MATERIALES[material]["kg_unidad"], 2)
 
@@ -98,7 +109,7 @@ def minuscula(nombre: str) -> str:
 def recicla_ahora(padron: pd.DataFrame, direccion: dict) -> None:
     estilo.portada("Recicla ahora", "Tu reciclaje, <em class='resalte'>en cuatro pasos</em>",
                    "Cuéntanos qué separaste y cuándo puede pasar el reciclador. Recibirás un ticket digital con código "
-                   "QR que reemplaza al ticket de papel. Cuando el reciclador lo valide, sumará a tu Bono Verde.")
+                   "QR que reemplaza al ticket de papel. Cuando el reciclador lo valide, sumará a tu Bono Verde.", fondo="tapa.jpg")
     estilo.guia("vera", "Enjuaga las botellas y las latas, y aplasta las cajas. Así tu entrega vale más.")
     estilo.como_usar([
         ("Ingresa", "Escribe tu código de contribuyente, que está en tu recibo de arbitrios."),
@@ -179,18 +190,22 @@ def recicla_ahora(padron: pd.DataFrame, direccion: dict) -> None:
                       f"<p>Recojo el {pd.Timestamp(ultimo['fecha']):%d/%m/%Y}, turno {ultimo['turno'].lower()}.</p>"
                       f"<p class='nota'>Muéstrale este código al reciclador. Cuando lo valide, revisa tus puntos en "
                       f"Mi Bono Verde.</p>", validado=ultimo["estado"] == "validado")
+        import base64
+        st.write("")
+        st.download_button("Descargar mi código QR", base64.b64decode(estilo.qr(ultimo["id"])),
+                           file_name=f"ticket-{ultimo['id']}.png", mime="image/png")
 
 
 # ───────────────────────────────────────────────────────── reciclador
 def reciclador(padron: pd.DataFrame, direccion: dict) -> None:
     estilo.portada("Para recicladores", "Valida cada recojo <em class='resalte'>en segundos</em>",
                    "Busca el ticket del vecino o escanea su código QR, pesa lo que recibes y confírmalo. Si el vecino "
-                   "no tiene ticket, regístralo escribiendo lo que te entregó.")
+                   "no tiene ticket, regístralo escribiendo lo que te entregó.", fondo="vidrio.jpg")
     estilo.guia("ciclo", "Pesa, confirma y listo. Tu trabajo queda registrado con tu carné.")
     estilo.identidad("ciclo", f"Sesión de {RECICLADOR[0]}", RECICLADOR[1])
     estilo.como_usar([
         ("Pide el ticket", "El vecino te muestra su código QR o te dice su código, por ejemplo T-0101."),
-        ("Búscalo", "Escanéalo con la cámara o escribe el código en el buscador."),
+        ("Búscalo", "Escanea el QR con la cámara, sube una foto del QR o escribe el código."),
         ("Pesa y corrige", "Escribe los kilos reales. Si vino mezclado, apaga «Vino bien separado»."),
         ("Valida", "Presiona Validar. El vecino suma puntos y tu trabajo queda registrado."),
     ])
@@ -198,7 +213,23 @@ def reciclador(padron: pd.DataFrame, direccion: dict) -> None:
 
     with pendientes:
         lista = [t for t in st.session_state.solicitudes if t["estado"] == "pendiente"]
-        buscado = st.text_input("Código del ticket", placeholder="Escanea el QR o escribe el código, por ejemplo T-0101")
+        modo = st.segmented_control("¿Cómo quieres buscar el ticket?", ["Escanear el QR con la cámara", "Subir una foto del QR",
+                                    "Escribir el código"], default="Escribir el código", key="modo_qr") or "Escribir el código"
+        buscado = ""
+        if modo == "Escribir el código":
+            buscado = st.text_input("Código del ticket", placeholder="Por ejemplo, T-0101")
+        else:
+            if modo == "Escanear el QR con la cámara":
+                foto = st.camera_input("Apunta la cámara al código QR que te muestra el vecino")
+            else:
+                foto = st.file_uploader("Sube la foto o la captura del código QR", type=["png", "jpg", "jpeg"])
+            if foto is not None:
+                buscado = leer_qr(foto.getvalue())
+                if buscado:
+                    st.markdown(f'<div class="qr-ok">Leímos el ticket <b>{buscado}</b>. Revisa los datos y valídalo abajo.</div>',
+                                unsafe_allow_html=True)
+                else:
+                    st.warning("No pudimos leer el código. Acerca más la cámara, evita reflejos o escribe el código.")
         if buscado.strip():
             lista = [t for t in lista if t["id"].lower() == buscado.strip().lower()]
         st.markdown(f'<p class="nota">{len(lista)} {"recojo pendiente" if len(lista) == 1 else "recojos pendientes"}.</p>', unsafe_allow_html=True)

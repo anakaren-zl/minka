@@ -145,9 +145,9 @@ El modelo es mixto. La municipalidad adopta la herramienta sin costo, puesto que
 |---|---|---|---|
 | Municipal | Municipalidad distrital | S/ 0 | Ticket digital, validación por recicladores, tablero y padrón de beneficiarios para rentas |
 | Trazabilidad | Empresa de envases | S/ 150 por tonelada de envases de sus marcas | Certificado mensual con fecha, sector y reciclador de cada entrega, sin datos personales |
-| Territorio | Empresa de envases | S/ 2,500 al mes | Certificados ilimitados, ranking de sectores para decidir inversiones y reportes para metas de material reciclado |
+| Territorio | Empresa de envases | S/ 2,500 al mes o S/ 25,000 al año | Certificados ilimitados, ranking de distritos con datos del MINAM para decidir inversiones, reportes para metas de material reciclado y un especialista asignado |
 
-Las tarifas constituyen supuestos de negocio que deberán validarse con las empresas durante el piloto.
+Al igual que en las aplicaciones por suscripción, la sección Únete muestra cada plan con su precio y lo que incluye. Las empresas pueden registrarse y pagar en línea con tarjeta, mientras que las municipalidades y las empresas que lo prefieran son contactadas por un especialista. Las tarifas constituyen supuestos de negocio que deberán validarse con las empresas durante el piloto.
 
 ### Costo por usuario
 
