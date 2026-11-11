@@ -67,7 +67,11 @@ a { color: #3E7A55; font-weight: 600; }
 .st-key-barra { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: .5rem 2rem;
   background: rgba(245,248,238,.88); backdrop-filter: blur(16px); border-bottom: 2px solid #E7F1D2; box-shadow: 0 8px 24px -18px rgba(30,77,58,.55); }
 .st-key-barra [data-testid="stHorizontalBlock"] { align-items: center !important; gap: .25rem; flex-wrap: nowrap; }
-.st-key-barra [data-testid="stColumn"] { display: flex; align-items: center; justify-content: center; min-width: 0; }
+.st-key-barra [data-testid="stHorizontalBlock"] { justify-content: space-between; }
+.st-key-barra [data-testid="stColumn"] { display: flex; align-items: center; justify-content: center;
+  flex: 0 1 auto !important; width: auto !important; min-width: max-content !important; }
+.st-key-barra [data-testid="stPageLink"] p, .st-key-barra [data-testid="stPageLink"] a { overflow: visible !important;
+  text-overflow: clip !important; max-width: none !important; }
 .st-key-barra [data-testid="stColumn"]:first-child { justify-content: flex-start; }
 .st-key-barra [data-testid="stColumn"] > div { width: 100%; }
 .st-key-barra [data-testid="stElementContainer"], .st-key-barra [data-testid="stMarkdownContainer"] { margin: 0 !important; }
@@ -422,6 +426,14 @@ iframe { border-radius: 20px; }
 [data-testid="stPopoverBody"] [data-testid="stPageLink"] a:hover { background: #E7F1D2; }
 [data-testid="stPopoverBody"] [data-testid="stPageLink"] p { font-weight: 600; color: #1E4D3A !important; }
 
+/* ---------- laptops pequeñas ---------- */
+@media (max-width: 1400px) {
+  .st-key-barra { padding: .5rem 1rem; }
+  .st-key-barra [data-testid="stPageLink"] a { padding: .4rem .5rem; }
+  .st-key-barra [data-testid="stPageLink"] p { font-size: .8rem; }
+  .marca-logo .lema { display: none; }
+}
+
 /* ---------- celular ---------- */
 @media (max-width: 900px) {
   .st-key-nav-hamb { display: block !important; }
@@ -433,6 +445,7 @@ iframe { border-radius: 20px; }
   .st-key-barra [data-testid="stHorizontalBlock"] { overflow-x: auto; scrollbar-width: none; justify-content: flex-start; }
   .st-key-barra [data-testid="stHorizontalBlock"]::-webkit-scrollbar { display: none; }
   .st-key-barra [data-testid="stColumn"] { flex: 0 0 auto !important; width: auto !important; min-width: auto !important; }
+  .st-key-barra [data-testid="stHorizontalBlock"] { justify-content: space-between !important; }
   .st-key-barra [data-testid="stPageLink"] p { font-size: .82rem; }
   .marca-logo .lema { display: none; }
   .marca-logo .nombre { font-size: 1.45rem; margin-right: .4rem; }
