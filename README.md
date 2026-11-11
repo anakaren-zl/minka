@@ -228,7 +228,7 @@ cp .env.example .env    # opcional, para activar Gemini con una clave propia
 uv run --python 3.12 --with-requirements requirements.txt python -m streamlit run app/streamlit_app.py
 ```
 
-La aplicación funciona aun sin clave de Gemini, dado que el extractor de reglas y la búsqueda en la base de conocimiento actúan como respaldo.
+La aplicación funciona aun sin clave de Gemini, dado que el extractor de reglas y la búsqueda en la base de conocimiento actúan como respaldo. Asimismo, la demo utiliza el nivel gratuito de Gemini, sin facturación habilitada, de modo que no existe riesgo de gasto, y la clave se guarda únicamente en los secretos de Streamlit Community Cloud y nunca en el código.
 
 ## 7. Modelo de negocio
 
@@ -312,6 +312,46 @@ Para analizar la competencia, se considera no solo a las empresas que ofrecen pr
 ### Barreras a la imitación
 
 La propuesta de Minka resulta difícil de copiar por tres razones. En primer lugar, los efectos de red, puesto que cada municipalidad que se suma aporta vecinos y recicladores que hacen más valioso el servicio para las empresas, y viceversa (Rochet y Tirole, 2003). En segundo lugar, la integración institucional, ya que el vínculo con las ordenanzas y con el área de rentas de cada municipalidad requiere un conocimiento de la gestión pública que las aplicaciones comerciales no poseen. Finalmente, el historial de datos, dado que los registros acumulados por distrito, sector, material y marca constituyen un activo que crece con el tiempo y que alimenta la clasificación de distritos para la inversión de las empresas.
+
+## Mercado
+
+El tamaño del mercado se estima en toneladas de envases reciclables generados en los hogares, puesto que la empresa paga por la trazabilidad de sus envases recuperados. Para ello, se emplearon los datos abiertos del MINAM correspondientes a 2023, considerando como envases las botellas de PET, las latas y metales, el vidrio y el Tetra Pak, y se valorizaron con la tarifa del plan Trazabilidad, de S/ 150 por tonelada (MINAM, 2024a).
+
+| Nivel | Ámbito | Envases reciclables al año | Valor anual potencial |
+|---|---|---|---|
+| TAM | Todos los distritos del Perú, con 33.7 millones de habitantes | 558,476 toneladas | S/ 83.8 millones |
+| SAM | Lima Metropolitana y el Callao, con 11.3 millones de habitantes | 224,600 toneladas | S/ 33.7 millones |
+| SOM | Las ocho municipalidades con Bono Verde identificadas, con 3 millones de habitantes, suponiendo que Minka recupera y certifica el 10 % de sus envases en tres años | 6,949 toneladas | S/ 1.04 millones, más las suscripciones del plan Territorio |
+
+Si bien estas cifras constituyen una aproximación, puesto que no todos los envases pertenecen a marcas clientes, muestran que el mercado alcanzable justifica un piloto. Asimismo, en el conjunto del Perú los hogares generan 1.3 millones de toneladas de residuos reciclables al año, de las cuales la mayor parte termina hoy en rellenos sanitarios o botaderos.
+
+## ¿Cómo conseguiríamos los primeros 10, 100 y 1,000 usuarios?
+
+**Los primeros 10.** Se iniciará con diez hogares de Carapongo, en Lurigancho-Chosica, distrito que cuenta con una ordenanza de descuento vigente desde 2024, y con un reciclador formalizado del Programa Recicla. La founder acompañará personalmente cada recojo durante el primer mes, con el fin de observar los puntos de fricción y ajustar el producto.
+
+**Los primeros 100.** Con la evidencia del primer mes, se propondrá a la subgerencia de gestión ambiental de la municipalidad un convenio gratuito para extender el ticket digital a un sector completo, mientras que los recicladores de la asociación invitarán a los vecinos que ya atienden. Al mismo tiempo, se presentará a Backus un certificado piloto de latas recuperadas, dado que la empresa identificó la lata como su envase prioritario.
+
+**Los primeros 1,000.** Con un primer cliente empresarial que financie los premios, se ampliará el servicio a tres sectores del distrito y se incorporará una segunda municipalidad con Bono Verde, como Villa El Salvador o San Juan de Lurigancho, aprovechando que el plan municipal es gratuito.
+
+## Plan a 3, 6 y 12 meses
+
+| Plazo | Objetivo | Indicador de éxito |
+|---|---|---|
+| 3 meses | Piloto en un sector de Lurigancho-Chosica con 100 hogares y 5 recicladores | 60 % de los hogares con al menos dos recojos válidos al mes |
+| 6 meses | Convenio formal con la municipalidad y primer cliente empresarial | Primer padrón de beneficiarios aplicado por el área de rentas y primer certificado pagado |
+| 12 meses | Tres municipalidades y tres empresas clientes | 3,000 hogares activos y punto de equilibrio entre ingresos y costos operativos |
+
+## Riesgos principales
+
+| Riesgo | Por qué importa | Cómo se mitiga |
+|---|---|---|
+| Baja adopción municipal | Sin ordenanza ni voluntad política no hay descuento que digitalizar | Plan gratuito, inicio en distritos con ordenanza vigente y uso del padrón como ahorro visible de trabajo |
+| Baja disposición a pagar de las empresas | Las tarifas aún son supuestos | Validación temprana con un certificado piloto y precio por tonelada sin mensualidad |
+| Calidad de los datos y posible fraude | Un registro inflado restaría credibilidad al certificado | Validación por un reciclador formalizado, peso en cada entrega y revisión de patrones atípicos |
+
+## Pedido al inversionista
+
+Minka solicitaría S/ 120,000 para financiar doce meses de operación. Este monto se distribuiría en desarrollo del producto, con el 40 %; premios y operación del piloto, con el 30 %; capacitación y equipamiento de recicladores, como balanzas digitales y planes de datos, con el 20 %; y asesoría legal en protección de datos personales y convenios municipales, con el 10 %.
 
 ## Limitaciones
 
