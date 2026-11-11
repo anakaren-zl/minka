@@ -1,8 +1,9 @@
 """El corazón de Minka: pasar del ticket de papel al ticket digital.
 
-1. El vecino, en «Recicla ahora», ingresa con su código de contribuyente, dice qué separó y cuándo
-   puede pasar el reciclador, y recibe un ticket con QR.
-2. El reciclador formalizado, con su carné, busca el ticket, pesa lo que recibe y lo valida.
+1. El vecino, en «Recicla ahora», ingresa con su código de contribuyente, dice qué separó y saca su bolsa
+   la noche anterior al día de ruta de su sector, identificada con el adhesivo QR de su vivienda.
+2. El reciclador recoge las bolsas en su ruta de madrugada. En el centro de acopio, el encargado de pesaje
+   de la asociación escanea el adhesivo o el ticket, pesa lo que llegó y lo valida con un solo celular.
 3. Solo la entrega validada suma al Bono Verde, al padrón municipal y al certificado de la empresa.
 
 Las solicitudes y entregas de la demo viven en st.session_state.
@@ -26,9 +27,19 @@ FORMULARIO = {
     "tetrapak": ("unidades", 1.0, "Cajas de leche o de jugo"),
     "plastico_otro": ("kg", 0.5, "Baldes, envases de champú o de detergente"),
 }
-TURNOS = ["Mañana, de 8 a 12 horas", "Tarde, de 14 a 18 horas"]
+TURNOS = ["La noche anterior, en la puerta de mi casa", "En mano, de 8 a 12 horas"]
+RUTA = (1, 4)  # días de ruta del sector en la demo, martes y viernes
+BONO_KG = 0.05  # bono por kilo validado de envases de marcas clientes, financiado por las empresas
 CUENTA_VERA = "C-159376"  # cuenta de prueba, vivienda sintética de Carapongo
 RECICLADOR = ("Don Ciclo", "Reciclador formalizado · Carné REC-01 · Asociación de recicladores de Lurigancho-Chosica")
+
+
+def proximo_dia_ruta(desde: date | None = None) -> date:
+    """Siguiente martes o viernes, los días de ruta del sector en la demo."""
+    dia = (desde or date.today()) + timedelta(days=1)
+    while dia.weekday() not in RUTA:
+        dia += timedelta(days=1)
+    return dia
 
 
 def iniciar(padron: pd.DataFrame) -> None:
@@ -100,6 +111,12 @@ def _resumen(lineas: list[dict]) -> str:
     return ", ".join(f"{minuscula(MATERIALES[l['material']]['nombre'])}{marca(l)} ({l['kg']:g} kg)" for l in lineas)
 
 
+def _modo(turno: str) -> str:
+    if turno.startswith("La noche"):
+        return "Bolsa en la puerta la noche anterior, el reciclador pasa desde las 5 de la mañana."
+    return f"Entrega {turno[0].lower()}{turno[1:]}."
+
+
 def minuscula(nombre: str) -> str:
     """Nombre del material en minúscula, sin perder las siglas (PET, Tetra Pak)."""
     return nombre.lower().replace("pet", "PET").replace("tetra pak", "Tetra Pak")
@@ -108,14 +125,14 @@ def minuscula(nombre: str) -> str:
 # ───────────────────────────────────────────────────────── vecino
 def recicla_ahora(padron: pd.DataFrame, direccion: dict) -> None:
     estilo.portada("Recicla ahora", "Tu reciclaje, <em class='resalte'>en cuatro pasos</em>",
-                   "Cuéntanos qué separaste y cuándo puede pasar el reciclador. Recibirás un ticket digital con código "
-                   "QR que reemplaza al ticket de papel. Cuando el reciclador lo valide, sumará a tu Bono Verde.", fondo="tapa.jpg")
+                   "Cuéntanos qué separaste y saca tu bolsa la noche anterior al día de ruta de tu sector. No necesitas "
+                   "esperar al reciclador. Cuando tu bolsa se pese en el centro de acopio, sumará a tu Bono Verde.", fondo="tapa.jpg")
     estilo.guia("vera", "Enjuaga las botellas y las latas, y aplasta las cajas. Así tu entrega vale más.")
     estilo.como_usar([
         ("Ingresa", "Escribe tu código de contribuyente, que está en tu recibo de arbitrios."),
         ("Cuenta lo que separaste", "Marca cuántas botellas, latas o kilos tienes, o escríbelo con tus palabras."),
-        ("Elige el día del recojo", "Indica cuándo puede pasar el reciclador formalizado por tu casa."),
-        ("Recibe tu ticket", "Muéstrale el código QR al reciclador. Él lo pesa y lo valida."),
+        ("Saca tu bolsa la noche anterior", "Tu reciclador pasa de madrugada por tu calle en los días de ruta."),
+        ("Identifica tu bolsa", "Pega el adhesivo QR de tu vivienda. En el centro de acopio lo escanean y pesan."),
     ], "Así funciona")
 
     estilo.seccion("Paso 1", "Ingresa con tu código de contribuyente")
@@ -156,14 +173,17 @@ def recicla_ahora(padron: pd.DataFrame, direccion: dict) -> None:
             else:
                 st.info("No reconocimos materiales en tu mensaje. Prueba con algo como «3 botellas y 2 latas».")
 
-    estilo.seccion("Paso 3", "¿Qué día puede pasar el reciclador por tu casa?",
-                   "El reciclador formalizado de tu sector pasará el día y en el turno que elijas. Ten tus materiales "
-                   "listos en la puerta, limpios y secos.")
+    estilo.seccion("Paso 3", "¿Cuándo pasa el reciclador por tu calle?",
+                   "El reciclador formalizado de tu sector sigue una ruta fija y pasa de madrugada, desde las 5 de la "
+                   "mañana. Saca tu bolsa la noche anterior y te enviaremos un recordatorio por WhatsApp esa tarde.")
+    st.markdown('<div class="banda"><b>Tu ruta pasa los martes y los viernes.</b> Saca tu bolsa la noche del lunes '
+                'o del jueves, cerrada y con el adhesivo de tu vivienda a la vista.</div>', unsafe_allow_html=True)
+    st.write("")
     c1, c2 = st.columns(2)
-    dia = c1.date_input("Día del recojo", value=date.today() + timedelta(days=1), min_value=date.today(),
+    dia = c1.date_input("Día de ruta en que dejarás tu bolsa", value=proximo_dia_ruta(), min_value=date.today(),
                         format="DD/MM/YYYY", key="rv_dia")
     with c2:
-        turno = st.pills("Turno del recojo", TURNOS, default=TURNOS[0], key="rv_turno") or TURNOS[0]
+        turno = st.pills("¿Cómo entregarás tu bolsa?", TURNOS, default=TURNOS[0], key="rv_turno") or TURNOS[0]
     limpio = st.checkbox("Confirmo que mis residuos están limpios, secos y separados", key="rv_ok")
 
     estilo.seccion("Paso 4", "Genera tu ticket digital")
@@ -187,59 +207,112 @@ def recicla_ahora(padron: pd.DataFrame, direccion: dict) -> None:
     if ultimo:
         st.write("")
         estilo.ticket(ultimo["id"], f"<p><b>{direccion[ultimo['codigo']]}</b></p><p>{_resumen(ultimo['lineas'])}</p>"
-                      f"<p>Recojo el {pd.Timestamp(ultimo['fecha']):%d/%m/%Y}, turno {ultimo['turno'].lower()}.</p>"
-                      f"<p class='nota'>Muéstrale este código al reciclador. Cuando lo valide, revisa tus puntos en "
-                      f"Mi Bono Verde.</p>", validado=ultimo["estado"] == "validado")
+                      f"<p>Recojo el {pd.Timestamp(ultimo['fecha']):%d/%m/%Y}. {_modo(ultimo['turno'])}</p>"
+                      f"<p class='nota'>No necesitas esperar al reciclador. En el centro de acopio escanearán tu adhesivo "
+                      f"o este código y pesarán tu bolsa. Cuando se valide, revisa tus puntos en Mi Bono Verde.</p>",
+                      validado=ultimo["estado"] == "validado")
         import base64
         st.write("")
-        st.download_button("Descargar mi código QR", base64.b64decode(estilo.qr(ultimo["id"])),
-                           file_name=f"ticket-{ultimo['id']}.png", mime="image/png")
+        contrib = padron.set_index("codigo").contribuyente.get(ultimo["codigo"], ultimo["codigo"])
+        b1, b2 = st.columns(2)
+        b1.download_button("Descargar el adhesivo QR de mi vivienda", base64.b64decode(estilo.qr(contrib)),
+                           file_name=f"adhesivo-{contrib}.png", mime="image/png", width="stretch",
+                           help="Imprímelo una sola vez y pégalo en tu bolsa o en tu puerta. Si no tienes impresora, "
+                                "la municipalidad te lo entrega al empadronarte.")
+        b2.download_button("Descargar el código de este ticket", base64.b64decode(estilo.qr(ultimo["id"])),
+                           file_name=f"ticket-{ultimo['id']}.png", mime="image/png", width="stretch")
 
 
 # ───────────────────────────────────────────────────────── reciclador
-def reciclador(padron: pd.DataFrame, direccion: dict) -> None:
-    estilo.portada("Para recicladores", "Valida cada recojo <em class='resalte'>en segundos</em>",
-                   "Busca el ticket del vecino o escanea su código QR, pesa lo que recibes y confírmalo. Si el vecino "
-                   "no tiene ticket, regístralo escribiendo lo que te entregó.", fondo="vidrio.jpg")
-    estilo.guia("ciclo", "Pesa, confirma y listo. Tu trabajo queda registrado con tu carné.")
-    estilo.identidad("ciclo", f"Sesión de {RECICLADOR[0]}", RECICLADOR[1])
+def lo_que_ganas(entregas: pd.DataFrame | None) -> None:
+    """El retorno real del reciclador, con el pago municipal como base y el bono de las empresas como alianza."""
+    estilo.seccion("Tu retorno", "Lo que ganas con Minka",
+                   "Minka no te da más trabajo, sino que te paga mejor por el que ya haces y lo hace visible. La "
+                   "municipalidad te retribuye por el servicio y las empresas suman un bono por cada kilo de sus envases.")
+    if entregas is not None and len(entregas):
+        e = entregas[entregas.reciclador == "REC-01"].copy()
+        e["mes"] = e.fecha.astype(str).str[:7]
+        mes = sorted(e.mes.unique())[-2] if e.mes.nunique() > 1 else e.mes.max()
+        e = e[e.mes == mes]
+        kg = float(e.kg.sum())
+        kg_marca = float(e[e.marca != SIN_MARCA].kg.sum())
+        viviendas = e.codigo.nunique()
+        nombre_mes = pd.Timestamp(mes + "-01").month_name(locale=None)
+        meses = {"January": "enero", "February": "febrero", "March": "marzo", "April": "abril", "May": "mayo",
+                 "June": "junio", "July": "julio", "August": "agosto", "September": "septiembre",
+                 "October": "octubre", "November": "noviembre", "December": "diciembre"}
+        estilo.metricas([
+            ("Kilos validados", f"{kg:,.0f} kg", f"Todo lo que se pesó a tu nombre en {meses.get(nombre_mes, mes)}."),
+            ("Kilos de marcas clientes", f"{kg_marca:,.0f} kg", "Envases de las empresas que pagan por su trazabilidad."),
+            ("Bono de las empresas", f"S/ {kg_marca * BONO_KG:,.2f}", "S/ 0.05 por cada kilo de marcas clientes, "
+             "además de lo que ganas al vender el material."),
+            ("Viviendas de tu ruta", f"{viviendas}", "Hogares que te entregaron al menos una bolsa en el mes."),
+        ], destacar=2)
+        st.write("")
+    estilo.fila_tarjetas([
+        estilo.tarjeta("Pago por el servicio", "Tu municipalidad recibe fondos del Programa de Incentivos del MEF por "
+                       "integrar recicladores formalizados. Tus registros son la prueba que necesita para pagarte.", paso="1"),
+        estilo.tarjeta("Bono por kilo", "Las empresas aliadas te pagan S/ 0.05 por cada kilo de sus envases que "
+                       "se valida a tu nombre.", paso="2"),
+        estilo.tarjeta("Más material y más limpio", "Las bolsas llegan separadas y tu ruta queda asignada, lo cual te "
+                       "protege frente a quienes venden el material de manera informal.", paso="3"),
+        estilo.tarjeta("Tu historial te respalda", "Cada kilo queda registrado con tu carné y respalda tu acceso a "
+                       "equipos de protección, capacitación y otros beneficios.", paso="4"),
+    ])
+    st.markdown('<p class="nota">Montos de ejemplo. El pago municipal depende del convenio de cada distrito y el bono, '
+                'de las empresas clientes.</p>', unsafe_allow_html=True)
+
+
+def reciclador(padron: pd.DataFrame, direccion: dict, entregas: pd.DataFrame | None = None) -> None:
+    estilo.portada("Para recicladores y centros de acopio", "Valida cada bolsa <em class='resalte'>en segundos</em>",
+                   "Recoge las bolsas en tu ruta de madrugada. En el centro de acopio, el encargado de pesaje de tu "
+                   "asociación escanea el adhesivo de cada vivienda, pesa y valida con un solo celular. No necesitas "
+                   "un celular propio.", fondo="vidrio.jpg")
+    estilo.guia("ciclo", "Recojo de madrugada y en el acopio pesamos todo junto. Mi trabajo queda registrado.")
+    estilo.identidad("ciclo", f"Ruta de {RECICLADOR[0]} · Centro de acopio de Carapongo", RECICLADOR[1])
+    lo_que_ganas(entregas)
+    estilo.seccion("En el centro de acopio", "Valida las bolsas del día")
     estilo.como_usar([
-        ("Pide el ticket", "El vecino te muestra su código QR o te dice su código, por ejemplo T-0101."),
-        ("Búscalo", "Escanea el QR con la cámara, sube una foto del QR o escribe el código."),
+        ("Recoge en tu ruta", "Los vecinos dejan su bolsa la noche anterior con el adhesivo de su vivienda."),
+        ("Escanea", "Escanea el adhesivo o el ticket con la cámara, sube una foto o escribe el código."),
         ("Pesa y corrige", "Escribe los kilos reales. Si vino mezclado, apaga «Vino bien separado»."),
         ("Valida", "Presiona Validar. El vecino suma puntos y tu trabajo queda registrado."),
     ])
-    pendientes, rapido = st.tabs(["Recojos con ticket", "Registro rápido sin ticket"])
+    pendientes, rapido = st.tabs(["Bolsas con adhesivo o ticket", "Registro rápido sin ticket"])
 
     with pendientes:
         lista = [t for t in st.session_state.solicitudes if t["estado"] == "pendiente"]
-        modo = st.segmented_control("¿Cómo quieres buscar el ticket?", ["Escanear el QR con la cámara", "Subir una foto del QR",
+        modo = st.segmented_control("¿Cómo quieres buscar la bolsa?", ["Escanear el QR con la cámara", "Subir una foto del QR",
                                     "Escribir el código"], default="Escribir el código", key="modo_qr") or "Escribir el código"
         buscado = ""
         if modo == "Escribir el código":
-            buscado = st.text_input("Código del ticket", placeholder="Por ejemplo, T-0101")
+            buscado = st.text_input("Código del adhesivo o del ticket", placeholder="Por ejemplo, C-159376 o T-0101")
         else:
             if modo == "Escanear el QR con la cámara":
-                foto = st.camera_input("Apunta la cámara al código QR que te muestra el vecino")
+                foto = st.camera_input("Apunta la cámara al adhesivo de la bolsa o al ticket")
             else:
                 foto = st.file_uploader("Sube la foto o la captura del código QR", type=["png", "jpg", "jpeg"])
             if foto is not None:
                 buscado = leer_qr(foto.getvalue())
                 if buscado:
-                    st.markdown(f'<div class="qr-ok">Leímos el ticket <b>{buscado}</b>. Revisa los datos y valídalo abajo.</div>',
+                    st.markdown(f'<div class="qr-ok">Leímos el código <b>{buscado}</b>. Revisa los datos y valídalo abajo.</div>',
                                 unsafe_allow_html=True)
                 else:
                     st.warning("No pudimos leer el código. Acerca más la cámara, evita reflejos o escribe el código.")
         if buscado.strip():
-            lista = [t for t in lista if t["id"].lower() == buscado.strip().lower()]
+            b = buscado.strip().upper()
+            if not b.startswith(("C-", "T-")) and b[:1].isdigit():
+                b = "C-" + b
+            vivienda = dict(zip(padron.contribuyente, padron.codigo)).get(b)
+            lista = [t for t in lista if t["id"].upper() == b or (vivienda and t["codigo"] == vivienda)]
         st.markdown(f'<p class="nota">{len(lista)} {"recojo pendiente" if len(lista) == 1 else "recojos pendientes"}.</p>', unsafe_allow_html=True)
         if not lista:
-            st.info("No hay recojos pendientes con ese código. Revisa que esté bien escrito.")
+            st.info("No hay bolsas pendientes con ese código. Revisa que esté bien escrito.")
         for t in lista:
             with st.container(border=True):
                 st.markdown(f'<span class="etiqueta">{t["id"]}</span><span class="etiqueta clara">'
                             f'{direccion[t["codigo"]]}</span>', unsafe_allow_html=True)
-                st.markdown(f"Recojo el **{pd.Timestamp(t['fecha']):%d/%m/%Y}**, turno {t['turno'].lower()}. "
+                st.markdown(f"Recojo el **{pd.Timestamp(t['fecha']):%d/%m/%Y}**. {_modo(t['turno'])} "
                             f"El vecino declaró {_resumen(t['lineas'])}.")
                 cols = st.columns(len(t["lineas"]) + 1)
                 reales = []

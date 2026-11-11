@@ -411,6 +411,19 @@ iframe { border-radius: 20px; }
   font-size: .82rem; border-radius: 999px; padding: .35rem .9rem; }
 .et-premios { font-size: .78rem; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; color: #4E7A5C; margin-bottom: 1rem; }
 .et-premios b { color: #1E4D3A; }
+.servicios { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+.servicios div { background: #F5F8EE; border-radius: 16px; padding: 1rem 1.1rem; }
+.servicios b { display: block; color: #1E4D3A; font-weight: 900; margin-bottom: .3rem; }
+.servicios span { color: #4E7A5C; font-size: .9rem; line-height: 1.45; }
+.banda.confianza { margin-top: 1rem; border-left: 6px solid #6DBE45; }
+.meta-barrio { background: linear-gradient(140deg, #1E4D3A, #3E8E63); border-radius: 24px; padding: 1.6rem 1.8rem; color: #FFFFFF; }
+.meta-barrio .mb-num { font-size: 1.15rem; } .meta-barrio .mb-num b { color: #D0E6A6; font-weight: 900; font-size: 1.6rem; }
+.meta-barrio .casas { display: flex; gap: .6rem; margin: 1rem 0; flex-wrap: wrap; }
+.meta-barrio .casa { width: 2.4rem; height: 2.4rem; background: rgba(255,255,255,.22);
+  clip-path: polygon(50% 0, 100% 42%, 100% 100%, 0 100%, 0 42%); }
+.meta-barrio .casa.on { background: #BFD37A; }
+.meta-barrio .casa.meta { outline: none; box-shadow: inset 0 -6px 0 #FFFFFF; }
+.meta-barrio .mb-est { font-weight: 700; }
 .premio { display: flex; gap: .9rem; align-items: center; margin-bottom: .9rem; }
 .premio .pt { width: 4.4rem; height: 4.4rem; border-radius: 18px; background: #E7F1D2; color: #1E4D3A; font-weight: 900;
   display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.05rem; }
@@ -436,6 +449,8 @@ iframe { border-radius: 20px; }
 
 /* ---------- celular ---------- */
 @media (max-width: 900px) {
+  .servicios { grid-template-columns: 1fr; }
+  .meta-barrio .casa { width: 1.7rem; height: 1.7rem; }
   .st-key-nav-hamb { display: block !important; }
   [class*="st-key-navsec-"], .st-key-nav-vera { display: none !important; }
   .st-key-barra [data-testid="stHorizontalBlock"] { overflow-x: visible !important; justify-content: space-between !important; }
