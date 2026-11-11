@@ -2,14 +2,14 @@
 
 | Campo | Detalle |
 |---|---|
-| Persona entrevistada | Coordinadora de sostenibilidad de Backus, empresa cervecera del grupo AB InBev, quien autorizó la mención de la empresa y de su cargo, mas no de su nombre |
+| Persona entrevistada | Coordinadora de sostenibilidad de Backus, empresa cervecera del grupo AB InBev, quien autorizó la mención de la empresa y de su cargo |
 | Fecha | 10 de noviembre de 2026 |
 | Medio | Mensajes de WhatsApp |
 | Registro | Respuesta escrita de la persona entrevistada, de la cual se citan fragmentos textuales |
 
 ## Contexto
 
-La conversación tuvo como propósito validar si una empresa productora de envases estaría dispuesta a financiar un sistema de registro y verificación del reciclaje domiciliario. Para ello, se le presentó de manera breve la propuesta de ReciclaGov y se le consultó si la empresa la consideraría útil o la pagaría, así como qué modificaría.
+La conversación tuvo como propósito validar si una empresa productora de envases estaría dispuesta a financiar un sistema de registro y verificación del reciclaje domiciliario. Para ello, se le presentó de manera breve la propuesta de Minka y se le consultó si la empresa la consideraría útil o la pagaría, así como qué modificaría.
 
 ## Hallazgos
 
@@ -18,7 +18,7 @@ La conversación tuvo como propósito validar si una empresa productora de envas
 3. **La trazabilidad por marca es la principal condición.** La persona entrevistada expresó dudas sobre la posibilidad de que el vecino junte y entregue únicamente envases de la empresa, ya que sin esa distinción no sería posible demostrar la trazabilidad.
 4. **La decisión de inversión requiere información territorial.** Asimismo, indicó que sería necesario un cruce entre distritos y zonas con mayor reciclaje, debido a que el monto de una inversión de este tipo es elevado.
 
-## Implicaciones para ReciclaGov
+## Implicaciones para Minka
 
 Esta sección corresponde a la interpretación de la autora y no a lo expresado por la persona entrevistada.
 
