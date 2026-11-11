@@ -1,0 +1,9 @@
+streamlit>=1.46
+pandas>=2.2
+folium>=0.17
+streamlit-folium>=0.22
+pydantic>=2.7
+google-genai>=1.0
+shapely>=2.0
+qrcode[pil]>=7.4
+opencv-python-headless>=4.9
