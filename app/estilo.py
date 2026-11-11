@@ -189,10 +189,12 @@ iframe { border-radius: 20px; }
   background: #FFFFFF !important; border: 2px solid #BFD37A !important; color: #1E4D3A !important;
   border-radius: 999px !important; font-weight: 600 !important; }
 [data-testid="stPills"] button[kind*="Active"], [data-testid="stButtonGroup"] button[kind*="Active"],
-[data-testid="stPills"] button[aria-checked="true"], [data-testid="stButtonGroup"] button[aria-checked="true"] {
+[data-testid="stPills"] button[aria-checked="true"], [data-testid="stButtonGroup"] button[aria-checked="true"],
+[data-testid="stButtonGroup"] button[aria-pressed="true"] {
   background: #1E4D3A !important; border-color: #1E4D3A !important; }
 [data-testid="stPills"] button[kind*="Active"] *, [data-testid="stButtonGroup"] button[kind*="Active"] *,
-[data-testid="stPills"] button[aria-checked="true"] *, [data-testid="stButtonGroup"] button[aria-checked="true"] * {
+[data-testid="stPills"] button[aria-checked="true"] *, [data-testid="stButtonGroup"] button[aria-checked="true"] *,
+[data-testid="stButtonGroup"] button[aria-pressed="true"] * {
   color: #FFFFFF !important; }
 
 /* pestañas como interruptor redondeado */

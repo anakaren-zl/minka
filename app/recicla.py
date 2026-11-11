@@ -101,6 +101,35 @@ def _kg(material: str, cantidad: float, unidad: str) -> float:
     return round(cantidad if unidad == "kg" else cantidad * MATERIALES[material]["kg_unidad"], 2)
 
 
+def _por_marca(mat: str, cantidad: float, unidad: str, paso: float) -> list[dict]:
+    """Reparte la cantidad de un material entre varias marcas. Lo que no se reparte queda como «Otra o no sé»."""
+    if mat not in MATERIAL_MARCAS:
+        return [{"material": mat, "kg": _kg(mat, cantidad, unidad), "marca": SIN_MARCA}]
+    elegidas = st.pills("¿De qué marcas son? Puedes elegir varias", MATERIAL_MARCAS[mat], selection_mode="multi",
+                        default=[], key=f"rv_marcas_{mat}") or []
+    if not elegidas:
+        return [{"material": mat, "kg": _kg(mat, cantidad, unidad), "marca": SIN_MARCA}]
+    if len(elegidas) == 1:
+        return [{"material": mat, "kg": _kg(mat, cantidad, unidad), "marca": elegidas[0]}]
+    texto = "¿Cuántas de cada marca?" if unidad == "unidades" else "¿Cuántos kilos de cada marca?"
+    st.markdown(f'<p class="nota" style="margin:.2rem 0">{texto}</p>', unsafe_allow_html=True)
+    base = cantidad / len(elegidas) if unidad == "kg" else int(cantidad) // len(elegidas)
+    resto = 0 if unidad == "kg" else int(cantidad) - base * len(elegidas)
+    lineas, repartido = [], 0.0
+    cols = st.columns(2)
+    for j, marca in enumerate(elegidas):
+        inicial = float(round(base, 2) if unidad == "kg" else base + (1 if j < resto else 0))
+        n = cols[j % 2].number_input(marca, 0.0, 200.0, inicial, paso, key=f"rv_{mat}_{marca}", format="%g")
+        repartido += n
+        if n > 0:
+            lineas.append({"material": mat, "kg": _kg(mat, n, unidad), "marca": marca})
+    if cantidad - repartido > 1e-9:
+        lineas.append({"material": mat, "kg": _kg(mat, cantidad - repartido, unidad), "marca": SIN_MARCA})
+    elif repartido - cantidad > 1e-9:
+        st.caption("Repartiste más de lo que indicaste arriba. Usaremos las cantidades por marca.")
+    return lineas
+
+
 def _puntos(lineas: list[dict]) -> int:
     return sum(round(MATERIALES[l["material"]]["puntos_kg"] * l["kg"]) for l in lineas)
 
@@ -153,11 +182,7 @@ def recicla_ahora(padron: pd.DataFrame, direccion: dict) -> None:
                 cantidad = st.number_input(f"¿Cuántas {unidad}?" if unidad == "unidades" else "¿Cuántos kilos?",
                                            0.0, 200.0, 0.0, paso, key=f"rv_{mat}", format="%g")
                 if cantidad > 0:
-                    marca = SIN_MARCA
-                    if mat in MATERIAL_MARCAS:
-                        marca = st.pills("¿De qué marca son la mayoría?", [SIN_MARCA] + MATERIAL_MARCAS[mat],
-                                         default=SIN_MARCA, key=f"rv_marca_{mat}") or SIN_MARCA
-                    lineas.append({"material": mat, "kg": _kg(mat, cantidad, unidad), "marca": marca})
+                    lineas += _por_marca(mat, cantidad, unidad, paso)
                 st.write("")
     with contar:
         nota = st.text_area("Escríbelo como se lo dirías a un vecino", key="rv_nota",
